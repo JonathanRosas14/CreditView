@@ -2,6 +2,8 @@ import { PrismaCardRepository, PrismaTransactionRepository } from "@creditview/i
 import { CardService } from "@creditview/core"
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import { getAlerts } from "@/actions/alerts"
+import { AlertBanner } from "@/components/alert-banner"
 
 const cardRepo = new PrismaCardRepository()
 const txRepo = new PrismaTransactionRepository()
@@ -12,6 +14,7 @@ export default async function DashboardPage() {
   if (!session?.user?.id) redirect("/login")
 
   const cards = await cardService.getUserCards(session.user.id)
+  const alerts = await getAlerts()
 
   const totalLimit = cards.reduce((sum, c) => sum + c.totalLimit.amount, 0)
   const totalUsed = cards.reduce((sum, c) => sum + c.usedBalance.amount, 0)
@@ -19,6 +22,8 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Dashboard</h1>
+
+      <AlertBanner alerts={alerts} />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-xl border p-4">
