@@ -1,6 +1,6 @@
 "use server"
 
-import { redirect } from "next/navigation"
+import { redirect, unstable_rethrow } from "next/navigation"
 import { signIn, signOut } from "@/lib/auth"
 import { loginSchema, registerSchema } from "@/lib/validation"
 import { prisma } from "@creditview/database"
@@ -21,9 +21,7 @@ export async function loginAction(_prevState: unknown, formData: FormData) {
 
     redirect("/dashboard")
   } catch (error) {
-    if (error instanceof Error && error.message?.includes("NEXT_REDIRECT")) {
-      throw error
-    }
+    unstable_rethrow(error)
     return { success: false, error: "Invalid email or password" }
   }
 }
@@ -63,9 +61,7 @@ export async function registerAction(_prevState: unknown, formData: FormData) {
 
     redirect("/dashboard")
   } catch (error) {
-    if (error instanceof Error && error.message?.includes("NEXT_REDIRECT")) {
-      throw error
-    }
+    unstable_rethrow(error)
     return { success: false, error: "Registration failed" }
   }
 }

@@ -1,4 +1,7 @@
+import type { Metadata } from "next"
 import { auth } from "@/lib/auth"
+
+export const metadata: Metadata = { title: "Settings" }
 
 export default async function SettingsPage() {
   const session = await auth()

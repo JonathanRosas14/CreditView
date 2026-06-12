@@ -2,12 +2,12 @@
   "name": "creditview",
   "private": true,
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
+    "dev": "turbo run dev",
+    "build": "turbo run build",
     "postinstall": "pnpm --filter @creditview/database exec prisma generate",
-    "lint": "turbo lint",
-    "typecheck": "turbo typecheck",
-    "test": "turbo test",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,json}\"",
     "db:migrate": "pnpm --filter @creditview/database exec prisma migrate dev",
     "db:studio": "pnpm --filter @creditview/database exec prisma studio"

@@ -1,4 +1,7 @@
+import type { Metadata } from "next"
 import { getStatements } from "@/actions/statements"
+
+export const metadata: Metadata = { title: "Statements" }
 
 export default async function StatementsPage() {
   const statements = await getStatements()

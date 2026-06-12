@@ -1,6 +1,9 @@
+import type { Metadata } from "next"
 import { PrismaCardRepository, PrismaTransactionRepository } from "@creditview/infra"
 import { CardService } from "@creditview/core"
 import { auth } from "@/lib/auth"
+
+export const metadata: Metadata = { title: "Dashboard" }
 import { redirect } from "next/navigation"
 import { getAlerts } from "@/actions/alerts"
 import { AlertBanner } from "@/components/alert-banner"

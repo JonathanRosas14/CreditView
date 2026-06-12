@@ -1,5 +1,8 @@
+import type { Metadata } from "next"
 import { getCards } from "@/actions/queries"
 import Link from "next/link"
+
+export const metadata: Metadata = { title: "Cards" }
 import { DeleteCardButton } from "./delete-card-button"
 
 export default async function CardsPage() {

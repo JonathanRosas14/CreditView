@@ -1,5 +1,8 @@
+import type { Metadata } from "next"
 import { getCards } from "@/actions/queries"
 import { ExportButton } from "./export-button"
+
+export const metadata: Metadata = { title: "Transactions" }
 
 export default async function TransactionsPage() {
   const cards = await getCards()

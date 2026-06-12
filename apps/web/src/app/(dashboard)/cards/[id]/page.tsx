@@ -1,5 +1,8 @@
+import type { Metadata } from "next"
 import { getCard, getCardTransactions } from "@/actions/queries"
 import { notFound } from "next/navigation"
+
+export const metadata: Metadata = { title: "Card Details" }
 import Link from "next/link"
 import { TransactionForm } from "@/components/transaction-form"
 

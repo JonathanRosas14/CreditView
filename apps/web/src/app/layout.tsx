@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CreditView",
-  description: "Credit card management system",
+  title: { default: "CreditView", template: "%s | CreditView" },
+  description: "Smart credit card management system. Track spending, manage balances, and stay on top of your finances.",
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({

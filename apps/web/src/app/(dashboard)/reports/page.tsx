@@ -1,4 +1,7 @@
+import type { Metadata } from "next"
 import { getCards } from "@/actions/queries"
+
+export const metadata: Metadata = { title: "Reports" }
 
 export default async function ReportsPage() {
   const cards = await getCards()
