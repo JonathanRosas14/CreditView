@@ -36,7 +36,7 @@ export async function getBudgets(): Promise<BudgetWithCard[]> {
 
   const now = new Date()
 
-  return budgets.map((b) => ({
+  return budgets.map((b: typeof budgets[number]) => ({
     id: b.id,
     category: b.category,
     amount: Number(b.amount),

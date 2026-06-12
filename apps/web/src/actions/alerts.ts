@@ -81,7 +81,7 @@ export async function getAlerts() {
     include: { card: { select: { name: true } } },
   })
 
-  return alerts.map((a) => ({
+  return alerts.map((a: { id: string; type: string; message: string; date: Date; isRead: boolean; card: { name: string } }) => ({
     id: a.id,
     type: a.type,
     message: a.message,
