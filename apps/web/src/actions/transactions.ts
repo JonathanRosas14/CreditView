@@ -3,6 +3,7 @@
 import { PrismaCardRepository, PrismaTransactionRepository } from "@creditview/infra"
 import { Money, Transaction } from "@creditview/core"
 import { verifySession } from "@/lib/dal"
+import { logAuditEvent } from "@/lib/audit"
 import { revalidatePath } from "next/cache"
 import { prisma } from "@creditview/database"
 import { createTransactionSchema } from "@/lib/validation"
@@ -46,6 +47,22 @@ export async function createTransactionAction(
 
     await cardRepo.save(cardRecord)
     await txRepo.save(tx)
+
+    await logAuditEvent({
+      userId: user.id,
+      entity: "Transaction",
+      entityId: tx.id,
+      action: "CREATE",
+      newValue: {
+        cardId,
+        type,
+        amount: tx.amount.amount,
+        currency: tx.currency,
+        description,
+        date: dateStr,
+        isInstallment: installments > 1,
+      },
+    })
 
     if (installments > 1) {
       const installmentAmount = Math.round((amount / installments) * 100) / 100
