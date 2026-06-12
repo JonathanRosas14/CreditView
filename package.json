@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
+    "postinstall": "pnpm --filter @creditview/database exec prisma generate",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "test": "turbo test",
