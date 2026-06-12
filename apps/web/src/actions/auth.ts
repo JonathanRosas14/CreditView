@@ -2,7 +2,10 @@
 
 import { redirect } from "next/navigation"
 import { signIn, signOut } from "@/lib/auth"
-import { loginSchema } from "@/lib/validation"
+import { loginSchema, registerSchema } from "@/lib/validation"
+import { prisma } from "@creditview/database"
+import bcrypt from "bcryptjs"
+import { logAuditEvent } from "@/lib/audit"
 
 export async function loginAction(_prevState: unknown, formData: FormData) {
   try {
@@ -22,6 +25,48 @@ export async function loginAction(_prevState: unknown, formData: FormData) {
       throw error
     }
     return { success: false, error: "Invalid email or password" }
+  }
+}
+
+export async function registerAction(_prevState: unknown, formData: FormData) {
+  try {
+    const parsed = registerSchema.safeParse(Object.fromEntries(formData))
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" }
+    }
+
+    const { name, email, password } = parsed.data
+
+    const existing = await prisma.user.findUnique({ where: { email } })
+    if (existing) {
+      return { success: false, error: "Email already registered" }
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    const user = await prisma.user.create({
+      data: { name, email, password: hashedPassword },
+    })
+
+    await logAuditEvent({
+      userId: user.id,
+      entity: "User",
+      entityId: user.id,
+      action: "REGISTER",
+    })
+
+    await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    })
+
+    redirect("/dashboard")
+  } catch (error) {
+    if (error instanceof Error && error.message?.includes("NEXT_REDIRECT")) {
+      throw error
+    }
+    return { success: false, error: "Registration failed" }
   }
 }
 
