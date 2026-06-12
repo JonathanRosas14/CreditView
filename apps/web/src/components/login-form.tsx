@@ -41,6 +41,15 @@ export function LoginForm() {
         <p className="text-sm text-red-500">{state.error}</p>
       )}
 
+      <div className="flex justify-end">
+        <a
+          href="/forgot-password"
+          className="text-xs text-zinc-500 underline hover:text-zinc-900"
+        >
+          Forgot password?
+        </a>
+      </div>
+
       <button
         type="submit"
         disabled={pending}

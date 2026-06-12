@@ -33,6 +33,19 @@ export const createCardSchema = z.object({
   currencyCode: z.string().length(3, "Currency code must be 3 characters"),
 })
 
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Invalid email address"),
+})
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, "Token is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string().min(6, "Confirm password is required"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+})
+
 export const createTransactionSchema = z.object({
   cardId: z.string().min(1, "Card ID is required"),
   type: z.enum(["PURCHASE", "PAYMENT", "ADVANCE"], {

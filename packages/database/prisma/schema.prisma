@@ -32,10 +32,25 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  cards      Card[]
-  alerts     Alert[]
-  budgets    Budget[]
-  auditLogs  AuditLog[]
+  cards       Card[]
+  alerts      Alert[]
+  budgets     Budget[]
+  auditLogs   AuditLog[]
+  resetTokens ResetToken[]
+}
+
+model ResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
 }
 
 model Currency {
