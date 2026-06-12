@@ -68,8 +68,6 @@ export async function generateAlerts() {
       }
     }
   }
-
-  revalidatePath("/dashboard")
 }
 
 export async function getAlerts() {
