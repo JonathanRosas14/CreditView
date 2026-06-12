@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TransactionType {
+  PURCHASE
+  ADVANCE
+  PAYMENT
+}
+
+enum AlertType {
+  CUTOFF
+  PAYMENT
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cards      Card[]
+  alerts     Alert[]
+  auditLogs  AuditLog[]
+}
+
+model Currency {
+  code   String @id
+  name   String
+  symbol String
+
+  cards  Card[]
+}
+
+model Card {
+  id               String   @id @default(cuid())
+  userId           String
+  name             String
+  bank             String
+  totalLimit       Decimal  @db.Decimal(14, 2)
+  usedBalance      Decimal  @db.Decimal(14, 2)
+  availableBalance Decimal  @db.Decimal(14, 2)
+  cutoffDay        Int
+  paymentDay       Int
+  interestRate     Decimal  @db.Decimal(5, 3)
+  currencyCode     String
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id])
+  currency     Currency      @relation(fields: [currencyCode], references: [code])
+  transactions Transaction[]
+  alerts       Alert[]
+
+  @@index([userId])
+  @@index([currencyCode])
+}
+
+model Transaction {
+  id             String          @id @default(cuid())
+  cardId         String
+  type           TransactionType
+  amount         Decimal         @db.Decimal(14, 2)
+  description    String
+  date           DateTime
+  currency       String
+  isInstallment  Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+
+  card          Card          @relation(fields: [cardId], references: [id])
+  installments  Installment[]
+
+  @@index([cardId])
+  @@index([cardId, date])
+  @@index([cardId, type])
+}
+
+model Installment {
+  id                 String   @id @default(cuid())
+  transactionId      String
+  totalInstallments  Int
+  paidInstallments   Int      @default(0)
+  installmentAmount  Decimal  @db.Decimal(14, 2)
+  nextDueDate        DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  transaction Transaction @relation(fields: [transactionId], references: [id])
+
+  @@index([transactionId])
+}
+
+model Alert {
+  id        String    @id @default(cuid())
+  userId    String
+  cardId    String
+  type      AlertType
+  message   String
+  date      DateTime
+  isRead    Boolean   @default(false)
+  sentAt    DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  card Card @relation(fields: [cardId], references: [id])
+
+  @@index([userId, date])
+  @@index([cardId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  entity    String
+  entityId  String
+  action    String
+  oldValue  Json?
+  newValue  Json?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entity, entityId])
+}
