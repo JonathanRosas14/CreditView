@@ -1,11 +1,15 @@
 import { getCards } from "@/actions/queries"
+import { ExportButton } from "./export-button"
 
 export default async function TransactionsPage() {
   const cards = await getCards()
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Transactions</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Transactions</h1>
+        <ExportButton />
+      </div>
       <p className="text-zinc-500">
         Select a card to view its transactions.
       </p>

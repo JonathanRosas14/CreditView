@@ -1,0 +1,38 @@
+import { z } from "zod"
+
+export const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+})
+
+export const createCardSchema = z.object({
+  name: z.string().min(1, "Card name is required"),
+  bank: z.string().min(1, "Bank name is required"),
+  totalLimit: z.coerce.number().positive("Total limit must be positive"),
+  cutoffDay: z.coerce
+    .number()
+    .int()
+    .min(1, "Cutoff day must be between 1 and 31")
+    .max(31, "Cutoff day must be between 1 and 31"),
+  paymentDay: z.coerce
+    .number()
+    .int()
+    .min(1, "Payment day must be between 1 and 31")
+    .max(31, "Payment day must be between 1 and 31"),
+  interestRate: z.coerce.number().min(0, "Interest rate must be non-negative"),
+  currencyCode: z.string().length(3, "Currency code must be 3 characters"),
+})
+
+export const createTransactionSchema = z.object({
+  cardId: z.string().min(1, "Card ID is required"),
+  type: z.enum(["PURCHASE", "PAYMENT", "ADVANCE"], {
+    error: "Type must be PURCHASE, PAYMENT, or ADVANCE",
+  }),
+  amount: z.coerce.number().positive("Amount must be positive"),
+  description: z.string().min(1, "Description is required"),
+  date: z.string().min(1, "Date is required"),
+  installments: z.coerce.number().int().min(0).default(0),
+})
+
+export type CreateCardInput = z.infer<typeof createCardSchema>
+export type CreateTransactionInput = z.infer<typeof createTransactionSchema>

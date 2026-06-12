@@ -2,28 +2,27 @@
 
 import { PrismaCardRepository, PrismaTransactionRepository } from "@creditview/infra"
 import { CardService } from "@creditview/core"
-import { auth } from "@/lib/auth"
+import { verifySession } from "@/lib/dal"
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
+import { createCardSchema } from "@/lib/validation"
 
 const cardRepo = new PrismaCardRepository()
 const txRepo = new PrismaTransactionRepository()
 const cardService = new CardService(cardRepo, txRepo)
 
 export async function createCardAction(_prevState: unknown, formData: FormData) {
-  const session = await auth()
-  if (!session?.user?.id) throw new Error("Unauthorized")
+  const user = await verifySession()
+
+  const parsed = createCardSchema.safeParse(Object.fromEntries(formData))
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" }
+  }
 
   try {
     await cardService.createCard({
-      userId: session.user.id,
-      name: formData.get("name") as string,
-      bank: formData.get("bank") as string,
-      totalLimit: Number(formData.get("totalLimit")),
-      cutoffDay: Number(formData.get("cutoffDay")),
-      paymentDay: Number(formData.get("paymentDay")),
-      interestRate: Number(formData.get("interestRate")),
-      currencyCode: formData.get("currencyCode") as string,
+      userId: user.id,
+      ...parsed.data,
     })
 
     revalidatePath("/cards")
@@ -34,8 +33,11 @@ export async function createCardAction(_prevState: unknown, formData: FormData) 
 }
 
 export async function deleteCardAction(id: string) {
-  const session = await auth()
-  if (!session?.user?.id) throw new Error("Unauthorized")
+  const user = await verifySession()
+
+  const card = await cardRepo.findById(id)
+  if (!card) throw new Error("Card not found")
+  if (card.userId !== user.id) throw new Error("Forbidden")
 
   await cardRepo.delete(id)
   revalidatePath("/cards")

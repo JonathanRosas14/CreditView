@@ -6,7 +6,7 @@ import { loginAction } from "@/actions/auth"
 export function LoginForm() {
   const [state, formAction, pending] = useActionState(loginAction, {
     success: false,
-    error: null,
+    error: "",
   })
 
   return (

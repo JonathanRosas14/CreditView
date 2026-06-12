@@ -12,8 +12,8 @@ export async function proxy(request: NextRequest) {
 
   if (isStatic || isAuthApi) return NextResponse.next()
 
-  const token = request.cookies.get("next-auth.session-token")?.value
-  const secureToken = request.cookies.get("__Secure-next-auth.session-token")?.value
+  const token = request.cookies.get("authjs.session-token")?.value
+  const secureToken = request.cookies.get("__Secure-authjs.session-token")?.value
   const hasSession = !!token || !!secureToken
 
   if (!hasSession && !isPublic) {

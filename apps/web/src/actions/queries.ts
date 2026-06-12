@@ -1,25 +1,26 @@
 "use server"
 
 import { PrismaCardRepository, PrismaTransactionRepository } from "@creditview/infra"
-import { auth } from "@/lib/auth"
+import { verifySession } from "@/lib/dal"
 
 const cardRepo = new PrismaCardRepository()
 const txRepo = new PrismaTransactionRepository()
 
 export async function getCards() {
-  const session = await auth()
-  if (!session?.user?.id) return []
-  return cardRepo.findByUserId(session.user.id)
+  const user = await verifySession()
+  return cardRepo.findByUserId(user.id)
 }
 
 export async function getCard(id: string) {
-  const session = await auth()
-  if (!session?.user?.id) return null
-  return cardRepo.findById(id)
+  const user = await verifySession()
+  const card = await cardRepo.findById(id)
+  if (!card || card.userId !== user.id) return null
+  return card
 }
 
 export async function getCardTransactions(cardId: string) {
-  const session = await auth()
-  if (!session?.user?.id) return []
+  const user = await verifySession()
+  const card = await cardRepo.findById(cardId)
+  if (!card || card.userId !== user.id) return []
   return txRepo.findByCardId(cardId)
 }

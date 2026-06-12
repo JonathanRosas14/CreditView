@@ -12,6 +12,8 @@ export function Sidebar({ user }: { user: { name?: string | null; email?: string
         <NavItem href="/dashboard" label="Dashboard" />
         <NavItem href="/cards" label="Cards" />
         <NavItem href="/transactions" label="Transactions" />
+        <NavItem href="/statements" label="Statements" />
+        <NavItem href="/budgets" label="Budgets" />
         <NavItem href="/reports" label="Reports" />
         <NavItem href="/settings" label="Settings" />
       </nav>
