@@ -3,6 +3,28 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  --color-bg-page: #FCF9F8;
+  --color-bg-panel-dark: #002434;
+  --color-text-primary: #002434;
+  --color-text-secondary: #42474B;
+  --color-text-muted: #72787C;
+  --color-text-link: #5D5F5C;
+  --color-border: #C2C7CC;
+  --color-accent: #C7E7FC;
+  --color-on-primary: #FFFFFF;
+  --color-glass-bg: rgba(255, 255, 255, 0.05);
+  --color-glass-border: rgba(255, 255, 255, 0.1);
+
+  --font-serif: var(--font-literata);
+  --font-sans: var(--font-dm-sans);
+
+  --radius-input: 8px;
+  --radius-button: 8px;
+  --radius-pill: 9999px;
+  --radius-card: 12px;
+
+  --input-height: 56px;
 }
 
 @theme inline {
@@ -12,15 +34,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }

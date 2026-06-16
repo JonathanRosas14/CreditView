@@ -8,7 +8,11 @@ export async function proxy(request: NextRequest) {
 
   const isPublic = publicRoutes.some((route) => pathname.startsWith(route))
   const isAuthApi = pathname.startsWith("/api/auth")
-  const isStatic = pathname.startsWith("/_next") || pathname === "/favicon.ico"
+  const isStatic =
+    pathname.startsWith("/_next") ||
+    pathname === "/favicon.ico" ||
+    pathname.startsWith("/assets/") ||
+    /\.(png|jpg|jpeg|gif|webp|svg|ico)$/i.test(pathname)
 
   if (isStatic || isAuthApi) return NextResponse.next()
 

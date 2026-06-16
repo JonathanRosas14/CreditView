@@ -6,10 +6,8 @@ export const metadata: Metadata = { title: "Reset Password" }
 
 export default function ResetPasswordPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <Suspense fallback={<div className="text-sm text-zinc-500">Loading...</div>}>
-        <ResetPasswordForm />
-      </Suspense>
-    </div>
+    <Suspense fallback={<div className="text-sm" style={{ color: "#72787C" }}>Loading...</div>}>
+      <ResetPasswordForm />
+    </Suspense>
   )
 }
