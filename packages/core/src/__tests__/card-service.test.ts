@@ -14,6 +14,8 @@ describe("CardService", () => {
     const txRepo: TransactionRepository = {
       save: vi.fn(),
       findByCardId: vi.fn(),
+      findById: vi.fn(),
+      delete: vi.fn(),
     }
 
     const service = new CardService(cardRepo, txRepo)
@@ -46,6 +48,8 @@ describe("CardService", () => {
     const txRepo: TransactionRepository = {
       save: vi.fn(),
       findByCardId: vi.fn(),
+      findById: vi.fn(),
+      delete: vi.fn(),
     }
 
     const service = new CardService(cardRepo, txRepo)
