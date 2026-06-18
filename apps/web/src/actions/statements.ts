@@ -18,6 +18,7 @@ export type MonthlyStatement = {
   totalPurchases: number
   totalPayments: number
   transactionCount: number
+  totalLimit: number
 }
 
 export async function getStatements(): Promise<MonthlyStatement[]> {
@@ -85,6 +86,7 @@ export async function getStatements(): Promise<MonthlyStatement[]> {
         totalPurchases: purchases,
         totalPayments: payments,
         transactionCount: data.txs.length,
+        totalLimit: card.totalLimit.amount,
       })
     }
   }

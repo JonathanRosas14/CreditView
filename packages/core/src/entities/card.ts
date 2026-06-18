@@ -61,6 +61,28 @@ export class Card {
     this.props.updatedAt = new Date()
   }
 
+  updateDetails(params: {
+    name?: string
+    bank?: string
+    totalLimit?: Money
+    cutoffDay?: number
+    paymentDay?: number
+    interestRate?: number
+    isActive?: boolean
+  }): void {
+    if (params.name !== undefined) this.props.name = params.name
+    if (params.bank !== undefined) this.props.bank = params.bank
+    if (params.totalLimit !== undefined) {
+      this.props.totalLimit = params.totalLimit
+      this.props.availableBalance = this.props.totalLimit.subtract(this.props.usedBalance)
+    }
+    if (params.cutoffDay !== undefined) this.props.cutoffDay = params.cutoffDay
+    if (params.paymentDay !== undefined) this.props.paymentDay = params.paymentDay
+    if (params.interestRate !== undefined) this.props.interestRate = params.interestRate
+    if (params.isActive !== undefined) this.props.isActive = params.isActive
+    this.props.updatedAt = new Date()
+  }
+
   deactivate(): void {
     this.props.isActive = false
     this.props.updatedAt = new Date()

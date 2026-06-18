@@ -1,34 +1,36 @@
 "use client"
 
 import { useActionState } from "react"
-import { createCardAction } from "@/actions/cards"
+import { useRouter } from "next/navigation"
+import { updateCardAction } from "@/actions/cards"
 
 const currencies = ["USD", "EUR", "GBP", "COP", "MXN", "ARS", "BRL", "CLP", "PEN"]
 
-export function CreateCardForm() {
-  const [state, formAction, pending] = useActionState(createCardAction, {
+export function EditCardForm({
+  cardId,
+  defaultValues,
+}: {
+  cardId: string
+  defaultValues: {
+    name: string
+    bank: string
+    totalLimit: number
+    currencyCode: string
+    cutoffDay: number
+    paymentDay: number
+    interestRate: number
+  }
+}) {
+  const router = useRouter()
+  const updateAction = updateCardAction.bind(null, cardId)
+  const [state, formAction, pending] = useActionState(updateAction, {
     success: false,
     error: null,
   })
 
   if (state?.success) {
-    return (
-      <div
-        className="rounded-xl border bg-white px-8 py-12 text-center"
-        style={{ borderColor: "#C2C7CC", borderRadius: "12px", maxWidth: "560px", width: "100%" }}
-      >
-        <p className="text-lg" style={{ fontFamily: "var(--font-literata)", color: "#002434" }}>
-          Card created successfully!
-        </p>
-        <a
-          href="/cards"
-          className="mt-4 inline-block text-xs uppercase no-underline"
-          style={{ fontFamily: "var(--font-dm-sans)", color: "#002434", letterSpacing: "1.1px" }}
-        >
-          &larr; Back to cards
-        </a>
-      </div>
-    )
+    router.push(`/cards/${cardId}`)
+    return null
   }
 
   return (
@@ -44,7 +46,7 @@ export function CreateCardForm() {
             fontWeight: 700,
           }}
         >
-          NEW CARD
+          EDIT CARD
         </p>
         <h1
           className="mt-2 text-[32px]"
@@ -55,7 +57,7 @@ export function CreateCardForm() {
             fontWeight: 400,
           }}
         >
-          Add a new card
+          Edit {defaultValues.name}
         </h1>
       </div>
 
@@ -71,6 +73,7 @@ export function CreateCardForm() {
             <input
               name="name"
               required
+              defaultValue={defaultValues.name}
               className="w-full border bg-white px-4 py-3 text-sm outline-none transition-colors"
               style={{
                 borderColor: "#C2C7CC",
@@ -78,7 +81,6 @@ export function CreateCardForm() {
                 fontFamily: "var(--font-dm-sans)",
                 color: "#002434",
               }}
-              placeholder="e.g. My Visa Platinum"
             />
           </label>
 
@@ -92,6 +94,7 @@ export function CreateCardForm() {
             <input
               name="bank"
               required
+              defaultValue={defaultValues.bank}
               className="w-full border bg-white px-4 py-3 text-sm outline-none transition-colors"
               style={{
                 borderColor: "#C2C7CC",
@@ -99,7 +102,6 @@ export function CreateCardForm() {
                 fontFamily: "var(--font-dm-sans)",
                 color: "#002434",
               }}
-              placeholder="e.g. Chase"
             />
           </label>
         </div>
@@ -117,6 +119,7 @@ export function CreateCardForm() {
               type="number"
               step="0.01"
               required
+              defaultValue={defaultValues.totalLimit}
               className="w-full border bg-white px-4 py-3 text-sm outline-none transition-colors"
               style={{
                 borderColor: "#C2C7CC",
@@ -137,6 +140,7 @@ export function CreateCardForm() {
             <select
               name="currencyCode"
               required
+              defaultValue={defaultValues.currencyCode}
               className="w-full border bg-white px-4 py-3 text-sm outline-none transition-colors"
               style={{
                 borderColor: "#C2C7CC",
@@ -169,6 +173,7 @@ export function CreateCardForm() {
               min="1"
               max="31"
               required
+              defaultValue={defaultValues.cutoffDay}
               className="w-full border bg-white px-4 py-3 text-sm outline-none transition-colors"
               style={{
                 borderColor: "#C2C7CC",
@@ -192,6 +197,7 @@ export function CreateCardForm() {
               min="1"
               max="31"
               required
+              defaultValue={defaultValues.paymentDay}
               className="w-full border bg-white px-4 py-3 text-sm outline-none transition-colors"
               style={{
                 borderColor: "#C2C7CC",
@@ -215,6 +221,7 @@ export function CreateCardForm() {
             type="number"
             step="0.001"
             required
+            defaultValue={defaultValues.interestRate}
             className="w-full border bg-white px-4 py-3 text-sm outline-none transition-colors"
             style={{
               borderColor: "#C2C7CC",
@@ -222,7 +229,6 @@ export function CreateCardForm() {
               fontFamily: "var(--font-dm-sans)",
               color: "#002434",
             }}
-            placeholder="e.g. 29.99"
           />
         </label>
 
@@ -250,10 +256,10 @@ export function CreateCardForm() {
               cursor: "pointer",
             }}
           >
-            {pending ? "Saving..." : "SAVE CARD"}
+            {pending ? "Saving..." : "SAVE CHANGES"}
           </button>
           <a
-            href="/cards"
+            href={`/cards/${cardId}`}
             className="text-xs uppercase no-underline"
             style={{
               fontFamily: "var(--font-dm-sans)",

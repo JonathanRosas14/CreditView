@@ -5,7 +5,7 @@ export const metadata: Metadata = { title: "Add Card" }
 
 export default function NewCardPage() {
   return (
-    <div>
+    <div className="flex items-start justify-center pt-8">
       <CreateCardForm />
     </div>
   )

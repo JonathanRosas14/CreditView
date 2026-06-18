@@ -33,6 +33,24 @@ export const createCardSchema = z.object({
   currencyCode: z.string().length(3, "Currency code must be 3 characters"),
 })
 
+export const updateCardSchema = z.object({
+  name: z.string().min(1, "Card name is required"),
+  bank: z.string().min(1, "Bank name is required"),
+  totalLimit: z.coerce.number().positive("Total limit must be positive"),
+  cutoffDay: z.coerce
+    .number()
+    .int()
+    .min(1, "Cutoff day must be between 1 and 31")
+    .max(31, "Cutoff day must be between 1 and 31"),
+  paymentDay: z.coerce
+    .number()
+    .int()
+    .min(1, "Payment day must be between 1 and 31")
+    .max(31, "Payment day must be between 1 and 31"),
+  interestRate: z.coerce.number().min(0, "Interest rate must be non-negative"),
+  currencyCode: z.string().length(3, "Currency code must be 3 characters"),
+})
+
 export const forgotPasswordSchema = z.object({
   email: z.string().email("Invalid email address"),
 })

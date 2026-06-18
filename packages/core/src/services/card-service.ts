@@ -40,4 +40,36 @@ export class CardService {
   async getUserCards(userId: string): Promise<Card[]> {
     return this.cardRepo.findByUserId(userId)
   }
+
+  async updateCard(
+    cardId: string,
+    userId: string,
+    params: {
+      name?: string
+      bank?: string
+      totalLimit?: number
+      currencyCode?: string
+      cutoffDay?: number
+      paymentDay?: number
+      interestRate?: number
+      isActive?: boolean
+    },
+  ): Promise<Card> {
+    const card = await this.cardRepo.findById(cardId)
+    if (!card) throw new Error("Card not found")
+    if (card.userId !== userId) throw new Error("Forbidden")
+
+    card.updateDetails({
+      name: params.name,
+      bank: params.bank,
+      totalLimit: params.totalLimit !== undefined ? new Money(params.totalLimit, params.currencyCode ?? card.currencyCode) : undefined,
+      cutoffDay: params.cutoffDay,
+      paymentDay: params.paymentDay,
+      interestRate: params.interestRate,
+      isActive: params.isActive,
+    })
+
+    await this.cardRepo.save(card)
+    return card
+  }
 }
