@@ -170,7 +170,7 @@ export default async function DashboardPage() {
                 No recent transactions
               </p>
             ) : (
-              recentTransactions.map((tx, i) => {
+              recentTransactions.map((tx) => {
                 const isNegative = tx.type !== "PAYMENT"
                 return (
                   <div

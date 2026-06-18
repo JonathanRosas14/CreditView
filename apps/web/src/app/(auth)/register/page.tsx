@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import Image from "next/image"
 import { RegisterForm } from "@/components/register-form"
 
 export const metadata: Metadata = { title: "Register" }
@@ -37,11 +38,13 @@ export default function RegisterPage() {
               boxShadow: "0px 25px 50px -12px rgba(0,0,0,0.25)",
             }}
           >
-            <img
+            <Image
               src="/assets/register-bg.png"
               alt=""
               className="block"
-              style={{ width: "523px", height: "auto" }}
+              width={523}
+              height={768}
+              style={{ height: "auto" }}
             />
             <div
               className="absolute rounded-lg p-[33px]"

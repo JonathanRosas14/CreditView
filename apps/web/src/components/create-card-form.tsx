@@ -1,6 +1,7 @@
 "use client"
 
 import { useActionState } from "react"
+import Link from "next/link"
 import { createCardAction } from "@/actions/cards"
 
 const currencies = ["USD", "EUR", "GBP", "COP", "MXN", "ARS", "BRL", "CLP", "PEN"]
@@ -20,13 +21,13 @@ export function CreateCardForm() {
         <p className="text-lg" style={{ fontFamily: "var(--font-literata)", color: "#002434" }}>
           Card created successfully!
         </p>
-        <a
+        <Link
           href="/cards"
           className="mt-4 inline-block text-xs uppercase no-underline"
           style={{ fontFamily: "var(--font-dm-sans)", color: "#002434", letterSpacing: "1.1px" }}
         >
           &larr; Back to cards
-        </a>
+        </Link>
       </div>
     )
   }
@@ -252,7 +253,7 @@ export function CreateCardForm() {
           >
             {pending ? "Saving..." : "SAVE CARD"}
           </button>
-          <a
+          <Link
             href="/cards"
             className="text-xs uppercase no-underline"
             style={{
@@ -263,7 +264,7 @@ export function CreateCardForm() {
             }}
           >
             Cancel
-          </a>
+          </Link>
         </div>
       </form>
     </div>

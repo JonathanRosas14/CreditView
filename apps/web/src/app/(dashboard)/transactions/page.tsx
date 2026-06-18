@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { getCards, getAllTransactions } from "@/actions/queries"
+import { getAllTransactions } from "@/actions/queries"
 import { ExportButton } from "./export-button"
 
 export const metadata: Metadata = { title: "Transactions" }
@@ -20,7 +20,7 @@ export default async function TransactionsPage({
 }) {
   const { page: pageStr } = await searchParams
   const currentPage = Math.max(1, parseInt(pageStr || "1", 10) || 1)
-  const { transactions, total, page, totalPages } = await getAllTransactions(currentPage, 10)
+  const { transactions, page, totalPages } = await getAllTransactions(currentPage, 10)
 
   return (
     <div className="space-y-8">

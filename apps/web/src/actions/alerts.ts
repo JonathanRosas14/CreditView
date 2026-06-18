@@ -27,7 +27,6 @@ export async function generateAlerts() {
   })
 
   const now = new Date()
-  const threshold = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000)
   const DAY_MS = 24 * 60 * 60 * 1000
 
   for (const card of cards) {

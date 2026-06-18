@@ -39,13 +39,6 @@ export async function getStatements(): Promise<MonthlyStatement[]> {
 
     if (sorted.length === 0) continue
 
-    let runningBalance = 0
-    for (const tx of sorted) {
-      runningBalance += tx.type === "PAYMENT" ? -tx.amount.amount : tx.amount.amount
-    }
-
-    const totalBalance = runningBalance
-
     for (const tx of sorted) {
       const key = `${tx.date.getFullYear()}-${String(tx.date.getMonth() + 1).padStart(2, "0")}`
       if (!byMonth.has(key)) {

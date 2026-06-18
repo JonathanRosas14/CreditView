@@ -10,7 +10,6 @@ function PasswordStrength({ password }: { password: string }) {
     /[0-9]/.test(password),
     /[^A-Za-z0-9]/.test(password),
   ]
-  const strength = checks.filter(Boolean).length
 
   return (
     <div className="flex gap-1">

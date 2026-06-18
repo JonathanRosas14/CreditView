@@ -2,7 +2,6 @@
 
 import { useActionState } from "react"
 import { markAlertAsRead, markAllAlertsAsRead } from "@/actions/alerts"
-import type { AlertType } from "@creditview/shared"
 
 interface AlertItem {
   id: string

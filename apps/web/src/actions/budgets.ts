@@ -34,8 +34,6 @@ export async function getBudgets(): Promise<BudgetWithCard[]> {
     orderBy: { createdAt: "desc" },
   })
 
-  const now = new Date()
-
   return budgets.map((b: typeof budgets[number]) => ({
     id: b.id,
     category: b.category,
