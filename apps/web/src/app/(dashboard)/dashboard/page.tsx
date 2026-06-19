@@ -4,7 +4,8 @@ import { CardService } from "@creditview/core"
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { getAlerts } from "@/actions/alerts"
-import { getRecentTransactions } from "@/actions/queries"
+import { getRecentTransactions, type RecentTransaction } from "@/actions/queries"
+import { prisma } from "@creditview/database"
 import { AlertBanner } from "@/components/alert-banner"
 
 const cardRepo = new PrismaCardRepository()
@@ -12,7 +13,7 @@ const txRepo = new PrismaTransactionRepository()
 const cardService = new CardService(cardRepo, txRepo)
 
 function formatDate(date: Date) {
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })
 }
 
 function formatCurrency(amount: number) {
@@ -21,23 +22,60 @@ function formatCurrency(amount: number) {
 
 export const metadata: Metadata = { title: "Dashboard" }
 
+type TxRow = { amount: number; description: string }
+type SpendingCat = { label: string; amount: number; fillPercent: number }
+
+function computeSpending(txRows: TxRow[]): SpendingCat[] {
+  const catMap: Record<string, (desc: string) => string> = {
+    ELECTRONICS: (d) => d.includes("amazon") || d.includes("apple") || d.includes("macbook") || d.includes("iphone") || d.includes("electronics") ? "ELECTRONICS" : "",
+    ESSENTIALS: (d) => d.includes("whole foods") || d.includes("éxito") || d.includes("supermarket") || d.includes("market") || d.includes("groceries") ? "ESSENTIALS" : "",
+    ENTERTAINMENT: (d) => d.includes("netflix") || d.includes("spotify") || d.includes("subscription") ? "ENTERTAINMENT" : "",
+    "TRAVEL & LEISURE": (d) => d.includes("uber") || d.includes("rappi") || d.includes("ride") || d.includes("transport") || d.includes("delta") || d.includes("lufthansa") || d.includes("airline") || d.includes("travel") ? "TRAVEL & LEISURE" : "",
+    "DINING & DRINK": (d) => d.includes("dining") || d.includes("restaurant") || d.includes("coucou") ? "DINING & DRINK" : "",
+  }
+  const catTotals: Record<string, number> = {}
+  for (const t of txRows) {
+    let assigned = "OTHER"
+    for (const [, fn] of Object.entries(catMap)) {
+      const c = fn(t.description.toLowerCase())
+      if (c) { assigned = c; break }
+    }
+    catTotals[assigned] = (catTotals[assigned] || 0) + t.amount
+  }
+  const grandTotal = Object.values(catTotals).reduce((s, v) => s + v, 0) || 1
+  const order = ["TRAVEL & LEISURE", "DINING & DRINK", "ELECTRONICS", "ESSENTIALS", "ENTERTAINMENT", "OTHER"]
+  return order
+    .filter((cat) => catTotals[cat])
+    .map((cat) => ({ label: cat, amount: catTotals[cat], fillPercent: Math.round((catTotals[cat] / grandTotal) * 100) }))
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 4)
+}
+
 export default async function DashboardPage() {
   const session = await auth()
   if (!session?.user?.id) redirect("/login")
 
-  const cards = await cardService.getUserCards(session.user.id)
-  const alerts = await getAlerts()
-  const recentTransactions = await getRecentTransactions(8)
+  const [cards, alerts] = await Promise.all([
+    cardService.getUserCards(session.user.id),
+    getAlerts(),
+  ])
+
+  const cardIds = cards.map((c) => c.id)
+
+  const [recentTx, spendingTxRows] = await Promise.all([
+    cardIds.length > 0 ? getRecentTransactions(8, cardIds) : Promise.resolve([] as RecentTransaction[]),
+    cardIds.length > 0
+      ? (await prisma.transaction.findMany({
+          where: { cardId: { in: cardIds }, type: { not: "PAYMENT" } },
+          select: { amount: true, description: true },
+        })).map((r) => ({ amount: Number(r.amount), description: r.description }))
+      : ([] as TxRow[]),
+  ])
 
   const totalLimit = cards.reduce((sum, c) => sum + c.totalLimit.amount, 0)
   const totalUsed = cards.reduce((sum, c) => sum + c.usedBalance.amount, 0)
 
-  const spendingCategories = [
-    { label: "TRAVEL & LEISURE", amount: 5229.13, fillPercent: 42 },
-    { label: "DINING & DRINK", amount: 3486.09, fillPercent: 28 },
-    { label: "ELECTRONICS", amount: 1867.54, fillPercent: 15 },
-    { label: "ESSENTIALS", amount: 1867.54, fillPercent: 15 },
-  ]
+  const spendingCategories = computeSpending(spendingTxRows)
 
   return (
     <div className="space-y-12">
@@ -165,12 +203,12 @@ export default async function DashboardPage() {
               ))}
             </div>
 
-            {recentTransactions.length === 0 ? (
+            {recentTx.length === 0 ? (
               <p className="py-8 text-center text-base" style={{ fontFamily: "var(--font-dm-sans)", color: "#72787C" }}>
                 No recent transactions
               </p>
             ) : (
-              recentTransactions.map((tx) => {
+              recentTx.map((tx) => {
                 const isNegative = tx.type !== "PAYMENT"
                 return (
                   <div
@@ -196,7 +234,7 @@ export default async function DashboardPage() {
                       className="text-[10px] uppercase"
                       style={{ fontFamily: "var(--font-dm-sans)", color: "#42474B", lineHeight: "16px", letterSpacing: "1px" }}
                     >
-                      {tx.cardName} &bull; {tx.cardId.slice(-4)}
+                      {tx.cardName}
                     </div>
                     <div
                       className="text-base text-right"

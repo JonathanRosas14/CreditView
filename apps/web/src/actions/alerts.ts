@@ -19,20 +19,22 @@ function getNextDate(dayOfMonth: number): { date: Date; label: string } {
   return { date: next, label }
 }
 
-export async function generateAlerts() {
-  const user = await verifySession()
-
-  const cards = await prisma.card.findMany({
-    where: { userId: user.id, isActive: true },
-  })
-
+export async function generateAlerts({
+  userId,
+  cards,
+}: {
+  userId: string
+  cards: { id: string; name: string; cutoffDay: number; paymentDay: number }[]
+}) {
   const now = new Date()
   const DAY_MS = 24 * 60 * 60 * 1000
 
+  const entries: { userId: string; cardId: string; type: "CUTOFF" | "PAYMENT"; message: string; date: Date; sentAt: Date }[] = []
+
   for (const card of cards) {
     for (const event of [
-      { day: card.cutoffDay, type: "CUTOFF" as const, template: " cutta en " },
-      { day: card.paymentDay, type: "PAYMENT" as const, template: " vence en " },
+      { day: card.cutoffDay, type: "CUTOFF" as const },
+      { day: card.paymentDay, type: "PAYMENT" as const },
     ]) {
       const { date: nextDate, label } = getNextDate(event.day)
       const diffMs = nextDate.getTime() - now.getTime()
@@ -41,38 +43,43 @@ export async function generateAlerts() {
       if (daysUntil >= 0 && daysUntil <= 3) {
         const dayText = daysUntil === 0 ? "hoy" : daysUntil === 1 ? "mañana" : `en ${daysUntil} días`
         const message = `${card.name} ${event.type === "CUTOFF" ? "corta" : "vence"} ${dayText} (${label})`
-
-        const existing = await prisma.alert.findFirst({
-          where: {
-            userId: user.id,
-            cardId: card.id,
-            type: event.type,
-            date: { gte: new Date(now.getTime() - DAY_MS) },
-            message,
-          },
-        })
-
-        if (!existing) {
-          await prisma.alert.create({
-            data: {
-              userId: user.id,
-              cardId: card.id,
-              type: event.type,
-              message,
-              date: nextDate,
-              sentAt: now,
-            },
-          })
-        }
+        entries.push({ userId, cardId: card.id, type: event.type, message, date: nextDate, sentAt: now })
       }
     }
+  }
+
+  if (entries.length === 0) return
+
+  const existing = await prisma.alert.findMany({
+    where: {
+      userId,
+      OR: entries.map((e) => ({
+        cardId: e.cardId,
+        type: e.type,
+        message: e.message,
+        date: { gte: new Date(now.getTime() - DAY_MS) },
+      })),
+    },
+    select: { cardId: true, type: true, message: true },
+  })
+
+  const existingSet = new Set(existing.map((e) => `${e.cardId}:${e.type}:${e.message}`))
+  const newEntries = entries.filter((e) => !existingSet.has(`${e.cardId}:${e.type}:${e.message}`))
+
+  if (newEntries.length > 0) {
+    await prisma.alert.createMany({ data: newEntries })
   }
 }
 
 export async function getAlerts() {
   const user = await verifySession()
 
-  await generateAlerts()
+  const cards = await prisma.card.findMany({
+    where: { userId: user.id, isActive: true },
+    select: { id: true, name: true, cutoffDay: true, paymentDay: true },
+  })
+
+  await generateAlerts({ userId: user.id, cards })
 
   const alerts = await prisma.alert.findMany({
     where: { userId: user.id },

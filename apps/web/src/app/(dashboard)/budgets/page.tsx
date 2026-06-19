@@ -1,60 +1,213 @@
 import type { Metadata } from "next"
 import { getBudgets } from "@/actions/budgets"
 import Link from "next/link"
+import { DeleteBudgetButton } from "./delete-budget-button"
 
 export const metadata: Metadata = { title: "Budgets" }
+
+function progressColor(used: number) {
+  if (used <= 50) return "#16A34A"
+  if (used <= 80) return "#FBBF24"
+  return "#BA1A1A"
+}
 
 export default async function BudgetsPage() {
   const budgets = await getBudgets()
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Budgets</h1>
+        <div className="space-y-1">
+          <h1
+            style={{
+              fontFamily: "var(--font-literata)",
+              fontWeight: 400,
+              fontSize: 32,
+              lineHeight: "48px",
+              color: "#002434",
+            }}
+          >
+            Budgets
+          </h1>
+          <p
+            style={{
+              fontFamily: "var(--font-dm-sans)",
+              fontWeight: 400,
+              fontSize: 16,
+              lineHeight: "24px",
+              color: "#42474B",
+            }}
+          >
+            Manage and track your monthly allocations.
+          </p>
+        </div>
         <Link
           href="/budgets/new"
-          className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white"
+          style={{
+            fontFamily: "var(--font-dm-sans)",
+            fontWeight: 700,
+            fontSize: 12,
+            lineHeight: "18px",
+            letterSpacing: "1.2px",
+            color: "#FFFFFF",
+            backgroundColor: "#002434",
+            padding: "16px 32px",
+            borderRadius: 12,
+            textDecoration: "none",
+            textTransform: "uppercase",
+          }}
         >
           Add Budget
         </Link>
       </div>
 
       {budgets.length === 0 ? (
-        <p className="text-zinc-500">No budgets yet. Create your first budget.</p>
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <p
+            style={{
+              fontFamily: "var(--font-literata)",
+              fontWeight: 400,
+              fontSize: 20,
+              color: "#002434",
+            }}
+          >
+            No budgets yet
+          </p>
+          <p
+            style={{
+              fontFamily: "var(--font-dm-sans)",
+              fontWeight: 400,
+              fontSize: 14,
+              color: "#72787C",
+              marginTop: 8,
+            }}
+          >
+            Create your first budget to start tracking your spending.
+          </p>
+        </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {budgets.map((b) => {
             const used = b.amount > 0 ? (b.spent / b.amount) * 100 : 0
-            const remaining = b.amount - b.spent
+            const clamped = Math.min(used, 100)
+            const color = progressColor(used)
 
             return (
-              <div key={b.id} className="rounded-xl border p-4">
-                <div className="mb-2 flex items-start justify-between">
-                  <div>
-                    <p className="font-semibold">{b.category}</p>
-                    <p className="text-xs text-zinc-500">
-                      {b.period} &middot; {b.card?.name ?? "All cards"}
-                    </p>
+              <div
+                key={b.id}
+                style={{
+                  backgroundColor: "#FFFFFF",
+                  borderRadius: 12,
+                  border: "1px solid #C2C7CC",
+                }}
+                className="flex flex-col"
+              >
+                <div className="flex flex-col gap-3 px-6 pt-6 pb-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex flex-col gap-0.5">
+                      <p
+                        style={{
+                          fontFamily: "var(--font-dm-sans)",
+                          fontWeight: 500,
+                          fontSize: 18,
+                          lineHeight: "27px",
+                          color: "#1C1B1B",
+                        }}
+                      >
+                        {b.category}
+                      </p>
+                      <p
+                        style={{
+                          fontFamily: "var(--font-dm-sans)",
+                          fontWeight: 400,
+                          fontSize: 12,
+                          lineHeight: "18px",
+                          color: "#42474B",
+                        }}
+                      >
+                        {b.card?.name ?? "All cards"}
+                      </p>
+                    </div>
+                    <span
+                      style={{
+                        fontFamily: "var(--font-dm-sans)",
+                        fontWeight: 700,
+                        fontSize: 10,
+                        lineHeight: "15px",
+                        letterSpacing: "1px",
+                        color: "#42474B",
+                        backgroundColor: "#F0EDED",
+                        padding: "4px 12px",
+                        borderRadius: 9999,
+                        textTransform: "uppercase",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {b.period}
+                    </span>
                   </div>
-                  <span className="rounded bg-zinc-100 px-2 py-0.5 text-xs font-medium">
-                    {used.toFixed(0)}%
-                  </span>
+
+                  <div className="flex items-baseline gap-1">
+                    <span
+                      style={{
+                        fontFamily: "var(--font-literata)",
+                        fontWeight: 400,
+                        fontSize: 24,
+                        lineHeight: "32px",
+                        color: "#002434",
+                      }}
+                    >
+                      ${b.spent.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "var(--font-dm-sans)",
+                        fontWeight: 400,
+                        fontSize: 14,
+                        lineHeight: "20px",
+                        color: "#42474B",
+                      }}
+                    >
+                      / ${b.amount.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="mb-3 h-2 overflow-hidden rounded-full bg-zinc-200">
+                <div className="px-6 pb-4">
                   <div
-                    className={`h-full rounded-full ${used > 90 ? "bg-red-500" : used > 70 ? "bg-amber-500" : "bg-zinc-800"}`}
-                    style={{ width: `${Math.min(used, 100)}%` }}
-                  />
+                    style={{
+                      backgroundColor: "#F0EDED",
+                      borderRadius: 9999,
+                      height: 4,
+                      width: "100%",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <div
+                      style={{
+                        backgroundColor: color,
+                        borderRadius: 9999,
+                        height: "100%",
+                        width: `${clamped}%`,
+                        transition: "width 0.3s ease",
+                      }}
+                    />
+                  </div>
                 </div>
 
-                <div className="flex justify-between text-sm">
-                  <span className="text-zinc-500">
-                    ${b.spent.toFixed(2)} spent
+                <div className="flex items-center justify-between px-6 pb-6">
+                  <span
+                    style={{
+                      fontFamily: "var(--font-dm-sans)",
+                      fontWeight: 700,
+                      fontSize: 12,
+                      lineHeight: "18px",
+                      color,
+                    }}
+                  >
+                    {used.toFixed(0)}% used
                   </span>
-                  <span className="font-medium">
-                    ${remaining.toFixed(2)} left
-                  </span>
+                  <DeleteBudgetButton budgetId={b.id} />
                 </div>
               </div>
             )

@@ -1,12 +1,13 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { getAllTransactions } from "@/actions/queries"
+import { getAllTransactions, getCards } from "@/actions/queries"
 import { ExportButton } from "./export-button"
+import { TransactionFilters } from "@/components/transaction-filters"
 
 export const metadata: Metadata = { title: "Transactions" }
 
 function formatDate(date: Date) {
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })
 }
 
 function formatCurrency(amount: number) {
@@ -16,11 +17,20 @@ function formatCurrency(amount: number) {
 export default async function TransactionsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>
+  searchParams: Promise<{ page?: string; cardId?: string; dateFrom?: string; dateTo?: string; search?: string }>
 }) {
-  const { page: pageStr } = await searchParams
-  const currentPage = Math.max(1, parseInt(pageStr || "1", 10) || 1)
-  const { transactions, page, totalPages } = await getAllTransactions(currentPage, 10)
+  const sp = await searchParams
+  const currentPage = Math.max(1, parseInt(sp.page || "1", 10) || 1)
+
+  const cards = await getCards()
+  const cardList = cards.map((c) => ({ id: c.id, name: c.name, bank: c.bank }))
+
+  const { transactions, page, totalPages } = await getAllTransactions(currentPage, 10, {
+    cardId: sp.cardId || undefined,
+    dateFrom: sp.dateFrom || undefined,
+    dateTo: sp.dateTo || undefined,
+    search: sp.search || undefined,
+  })
 
   return (
     <div className="space-y-8">
@@ -73,118 +83,7 @@ export default async function TransactionsPage({
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        <div
-          className="relative"
-          style={{ width: "236px" }}
-        >
-          <select
-            className="w-full appearance-none border bg-white px-4 py-3 pr-10 text-base outline-none"
-            style={{
-              borderColor: "#C2C7CC",
-              borderRadius: "8px",
-              fontFamily: "var(--font-dm-sans)",
-              color: "#1C1B1B",
-              lineHeight: "25.6px",
-              fontWeight: 400,
-              backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='12' height='7' viewBox='0 0 12 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%2372787C' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\")",
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "right 16px center",
-              backgroundSize: "12px",
-            }}
-          >
-            <option>All Accounts</option>
-          </select>
-          <span
-            className="absolute -top-2.5 left-3 px-1 text-[10px] uppercase"
-            style={{
-              fontFamily: "var(--font-dm-sans)",
-              color: "#72787C",
-              lineHeight: "15px",
-              letterSpacing: "1px",
-              fontWeight: 400,
-              backgroundColor: "#FCF9F8",
-            }}
-          >
-            SELECT CARD
-          </span>
-        </div>
-
-        <div
-          className="relative"
-          style={{ width: "250px" }}
-        >
-          <div
-            className="flex items-center gap-2 border bg-white px-4 py-3"
-            style={{
-              borderColor: "#C2C7CC",
-              borderRadius: "8px",
-            }}
-          >
-            <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="0.5" y="2.5" width="13" height="12" rx="2" stroke="#72787C" strokeWidth="1.2" />
-              <line x1="0.5" y1="6.5" x2="13.5" y2="6.5" stroke="#72787C" strokeWidth="1.2" />
-              <line x1="5" y1="10.5" x2="9" y2="10.5" stroke="#72787C" strokeWidth="1.2" strokeLinecap="round" />
-            </svg>
-            <span
-              className="text-base"
-              style={{
-                fontFamily: "var(--font-dm-sans)",
-                color: "#1C1B1B",
-                lineHeight: "25.6px",
-                fontWeight: 400,
-              }}
-            >
-              Oct 01 &ndash; Oct 31, 2023
-            </span>
-          </div>
-          <span
-            className="absolute -top-2.5 left-3 px-1 text-[10px] uppercase"
-            style={{
-              fontFamily: "var(--font-dm-sans)",
-              color: "#72787C",
-              lineHeight: "15px",
-              letterSpacing: "1px",
-              fontWeight: 400,
-              backgroundColor: "#FCF9F8",
-            }}
-          >
-            DATE RANGE
-          </span>
-        </div>
-
-        <div
-          className="relative flex-1"
-          style={{ maxWidth: "379px" }}
-        >
-          <input
-            type="text"
-            placeholder="Filter by merchant or category"
-            className="w-full border bg-white pl-12 pr-4 text-base outline-none"
-            style={{
-              borderColor: "#C2C7CC",
-              borderRadius: "8px",
-              paddingTop: "14px",
-              paddingBottom: "14.6px",
-              fontFamily: "var(--font-dm-sans)",
-              color: "#6B7280",
-              lineHeight: "20.8px",
-              fontWeight: 400,
-            }}
-          />
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 18 18"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)" }}
-          >
-            <circle cx="7.5" cy="7.5" r="5.5" stroke="#72787C" strokeWidth="1.2" />
-            <line x1="11.5" y1="11.5" x2="16" y2="16" stroke="#72787C" strokeWidth="1.2" strokeLinecap="round" />
-          </svg>
-        </div>
-      </div>
+      <TransactionFilters cards={cardList} />
 
       <div
         className="overflow-x-auto rounded-xl border bg-white"
@@ -198,7 +97,7 @@ export default async function TransactionsPage({
           className="grid grid-cols-12 items-center"
           style={{ backgroundColor: "#F6F3F2" }}
         >
-          {["DATE", "MERCHANT", "CARD", "CATEGORY", "AMOUNT", "STATUS"].map((header) => (
+          {["DATE", "MERCHANT", "CARD", "TYPE", "AMOUNT", "STATUS"].map((header) => (
             <div
               key={header}
               className="px-8 py-5 text-xs font-bold uppercase"
@@ -209,7 +108,7 @@ export default async function TransactionsPage({
                 letterSpacing: "1.8px",
                 fontWeight: 700,
                 textAlign: header === "AMOUNT" ? "right" : "left",
-                gridColumn: header === "DATE" ? "span 1" : header === "MERCHANT" ? "span 3" : header === "CARD" ? "span 2" : header === "CATEGORY" ? "span 2" : header === "AMOUNT" ? "span 2" : "span 2",
+                gridColumn: header === "DATE" ? "span 1" : header === "MERCHANT" ? "span 3" : header === "CARD" ? "span 2" : header === "TYPE" ? "span 2" : header === "AMOUNT" ? "span 2" : "span 2",
               }}
             >
               {header}
@@ -279,7 +178,7 @@ export default async function TransactionsPage({
                     gridColumn: "span 2",
                   }}
                 >
-                  &bull;&bull;&bull;&bull; {tx.cardId.slice(-4)}
+                  {tx.cardName}
                 </div>
                 <div
                   className="px-8 py-6"
@@ -296,7 +195,7 @@ export default async function TransactionsPage({
                       letterSpacing: "1px",
                     }}
                   >
-                    {tx.category}
+                    {tx.type === "PURCHASE" ? "COMPRA" : tx.type === "PAYMENT" ? "PAGO" : "ADELANTO"}
                   </span>
                 </div>
                 <div

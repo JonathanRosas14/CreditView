@@ -22,13 +22,13 @@ export const createCardSchema = z.object({
   cutoffDay: z.coerce
     .number()
     .int()
-    .min(1, "Cutoff day must be between 1 and 31")
-    .max(31, "Cutoff day must be between 1 and 31"),
+    .min(1, "Cutoff day must be between 1 and 30")
+    .max(30, "Cutoff day must be between 1 and 30"),
   paymentDay: z.coerce
     .number()
     .int()
-    .min(1, "Payment day must be between 1 and 31")
-    .max(31, "Payment day must be between 1 and 31"),
+    .min(1, "Payment day must be between 1 and 30")
+    .max(30, "Payment day must be between 1 and 30"),
   interestRate: z.coerce.number().min(0, "Interest rate must be non-negative"),
   currencyCode: z.string().length(3, "Currency code must be 3 characters"),
 })
@@ -40,13 +40,13 @@ export const updateCardSchema = z.object({
   cutoffDay: z.coerce
     .number()
     .int()
-    .min(1, "Cutoff day must be between 1 and 31")
-    .max(31, "Cutoff day must be between 1 and 31"),
+    .min(1, "Cutoff day must be between 1 and 30")
+    .max(30, "Cutoff day must be between 1 and 30"),
   paymentDay: z.coerce
     .number()
     .int()
-    .min(1, "Payment day must be between 1 and 31")
-    .max(31, "Payment day must be between 1 and 31"),
+    .min(1, "Payment day must be between 1 and 30")
+    .max(30, "Payment day must be between 1 and 30"),
   interestRate: z.coerce.number().min(0, "Interest rate must be non-negative"),
   currencyCode: z.string().length(3, "Currency code must be 3 characters"),
 })
@@ -73,6 +73,7 @@ export const createTransactionSchema = z.object({
   description: z.string().min(1, "Description is required"),
   date: z.string().min(1, "Date is required"),
   installments: z.coerce.number().int().min(0).default(0),
+  budgetId: z.string().optional(),
 })
 
 export type CreateCardInput = z.infer<typeof createCardSchema>

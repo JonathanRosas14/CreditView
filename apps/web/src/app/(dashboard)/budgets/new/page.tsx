@@ -11,70 +11,223 @@ export default function NewBudgetPage() {
 
   if (state?.success) {
     return (
-      <div className="space-y-6">
-        <h1 className="text-2xl font-bold">New Budget</h1>
-        <div className="rounded-xl border p-6 text-center">
-          <p className="font-medium text-green-600">Budget created!</p>
+      <div className="space-y-8">
+        <h1
+          style={{
+            fontFamily: "var(--font-literata)",
+            fontWeight: 400,
+            fontSize: 32,
+            lineHeight: "48px",
+            color: "#002434",
+          }}
+        >
+          New Budget
+        </h1>
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: 12,
+            border: "1px solid #C2C7CC",
+            padding: 32,
+            textAlign: "center",
+          }}
+        >
+          <p
+            style={{
+              fontFamily: "var(--font-dm-sans)",
+              fontWeight: 500,
+              fontSize: 16,
+              color: "#16A34A",
+            }}
+          >
+            Budget created successfully!
+          </p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">New Budget</h1>
+    <div className="space-y-8">
+      <h1
+        style={{
+          fontFamily: "var(--font-literata)",
+          fontWeight: 400,
+          fontSize: 32,
+          lineHeight: "48px",
+          color: "#002434",
+        }}
+      >
+        New Budget
+      </h1>
 
-      <form action={formAction} className="max-w-md space-y-4 rounded-xl border p-6">
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Category</span>
+      <form
+        action={formAction}
+        style={{
+          maxWidth: 480,
+          backgroundColor: "#FFFFFF",
+          borderRadius: 12,
+          border: "1px solid #C2C7CC",
+          padding: 32,
+        }}
+        className="space-y-5"
+      >
+        <label className="flex flex-col gap-1.5">
+          <span
+            style={{
+              fontFamily: "var(--font-dm-sans)",
+              fontWeight: 700,
+              fontSize: 12,
+              lineHeight: "18px",
+              letterSpacing: "1.1px",
+              color: "#42474B",
+              textTransform: "uppercase",
+            }}
+          >
+            Category
+          </span>
           <input
             name="category"
             required
-            className="rounded-lg border px-3 py-2 text-sm"
             placeholder="e.g. Groceries, Entertainment"
+            style={{
+              fontFamily: "var(--font-dm-sans)",
+              fontSize: 14,
+              color: "#002434",
+              border: "1px solid #C2C7CC",
+              borderRadius: 8,
+              padding: "12px 16px",
+              outline: "none",
+            }}
           />
         </label>
 
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Amount</span>
+        <label className="flex flex-col gap-1.5">
+          <span
+            style={{
+              fontFamily: "var(--font-dm-sans)",
+              fontWeight: 700,
+              fontSize: 12,
+              lineHeight: "18px",
+              letterSpacing: "1.1px",
+              color: "#42474B",
+              textTransform: "uppercase",
+            }}
+          >
+            Amount
+          </span>
           <input
             name="amount"
             type="number"
             step="0.01"
             required
-            className="rounded-lg border px-3 py-2 text-sm"
+            placeholder="0.00"
+            style={{
+              fontFamily: "var(--font-dm-sans)",
+              fontSize: 14,
+              color: "#002434",
+              border: "1px solid #C2C7CC",
+              borderRadius: 8,
+              padding: "12px 16px",
+              outline: "none",
+            }}
           />
         </label>
 
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Period</span>
+        <label className="flex flex-col gap-1.5">
+          <span
+            style={{
+              fontFamily: "var(--font-dm-sans)",
+              fontWeight: 700,
+              fontSize: 12,
+              lineHeight: "18px",
+              letterSpacing: "1.1px",
+              color: "#42474B",
+              textTransform: "uppercase",
+            }}
+          >
+            Period
+          </span>
           <select
             name="period"
             required
-            className="rounded-lg border px-3 py-2 text-sm"
+            style={{
+              fontFamily: "var(--font-dm-sans)",
+              fontSize: 14,
+              color: "#002434",
+              border: "1px solid #C2C7CC",
+              borderRadius: 8,
+              padding: "12px 16px",
+              outline: "none",
+              background: "#FFFFFF",
+            }}
           >
             <option value="MONTHLY">Monthly</option>
             <option value="YEARLY">Yearly</option>
           </select>
         </label>
 
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Start Date</span>
+        <label className="flex flex-col gap-1.5">
+          <span
+            style={{
+              fontFamily: "var(--font-dm-sans)",
+              fontWeight: 700,
+              fontSize: 12,
+              lineHeight: "18px",
+              letterSpacing: "1.1px",
+              color: "#42474B",
+              textTransform: "uppercase",
+            }}
+          >
+            Start Date
+          </span>
           <input
             name="startDate"
             type="date"
             required
             defaultValue={new Date().toISOString().split("T")[0]}
-            className="rounded-lg border px-3 py-2 text-sm"
+            style={{
+              fontFamily: "var(--font-dm-sans)",
+              fontSize: 14,
+              color: "#002434",
+              border: "1px solid #C2C7CC",
+              borderRadius: 8,
+              padding: "12px 16px",
+              outline: "none",
+            }}
           />
         </label>
 
-        {state?.error && <p className="text-sm text-red-500">{state.error}</p>}
+        {state?.error && (
+          <p
+            style={{
+              fontFamily: "var(--font-dm-sans)",
+              fontSize: 13,
+              color: "#DC2626",
+            }}
+          >
+            {state.error}
+          </p>
+        )}
 
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          style={{
+            fontFamily: "var(--font-dm-sans)",
+            fontWeight: 400,
+            fontSize: 12,
+            lineHeight: "18px",
+            letterSpacing: "1.2px",
+            color: "#FFFFFF",
+            backgroundColor: "#002434",
+            padding: "16px 32px",
+            borderRadius: 12,
+            border: "none",
+            cursor: pending ? "not-allowed" : "pointer",
+            opacity: pending ? 0.6 : 1,
+            textTransform: "uppercase",
+          }}
         >
           {pending ? "Saving..." : "Create Budget"}
         </button>

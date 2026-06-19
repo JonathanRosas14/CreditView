@@ -7,6 +7,7 @@ async function main() {
   // Clean existing data (respect FK order)
   await prisma.installment.deleteMany()
   await prisma.transaction.deleteMany()
+  await prisma.budget.deleteMany()
   await prisma.alert.deleteMany()
   await prisma.auditLog.deleteMany()
   await prisma.card.deleteMany()
@@ -89,6 +90,65 @@ async function main() {
     },
   })
 
+  // Seed budgets
+  const now = new Date()
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+
+  const foodBudget = await prisma.budget.create({
+    data: {
+      userId: user.id,
+      category: "Food",
+      amount: 500,
+      period: "MONTHLY",
+      startDate: startOfMonth,
+      spent: 0,
+    },
+  })
+
+  const shoppingBudget = await prisma.budget.create({
+    data: {
+      userId: user.id,
+      category: "Shopping",
+      amount: 2000,
+      period: "MONTHLY",
+      startDate: startOfMonth,
+      spent: 0,
+    },
+  })
+
+  const entertainmentBudget = await prisma.budget.create({
+    data: {
+      userId: user.id,
+      category: "Entertainment",
+      amount: 200,
+      period: "MONTHLY",
+      startDate: startOfMonth,
+      spent: 0,
+    },
+  })
+
+  const transportBudget = await prisma.budget.create({
+    data: {
+      userId: user.id,
+      category: "Transport",
+      amount: 300,
+      period: "MONTHLY",
+      startDate: startOfMonth,
+      spent: 0,
+    },
+  })
+
+  const electronicsBudget = await prisma.budget.create({
+    data: {
+      userId: user.id,
+      category: "Electronics",
+      amount: 3000,
+      period: "MONTHLY",
+      startDate: startOfMonth,
+      spent: 0,
+    },
+  })
+
   // Helper: create transaction and update card balance
   async function addTx(
     cardId: string,
@@ -96,7 +156,7 @@ async function main() {
     amount: number,
     description: string,
     date: Date,
-    opts?: { installments?: number },
+    opts?: { installments?: number; budgetId?: string },
   ) {
     const card = await prisma.card.findUniqueOrThrow({ where: { id: cardId } })
 
@@ -114,6 +174,7 @@ async function main() {
         date,
         currency: card.currencyCode,
         isInstallment: !!opts?.installments && opts.installments > 1,
+        budgetId: opts?.budgetId ?? null,
       },
     })
 
@@ -138,30 +199,44 @@ async function main() {
     })
   }
 
-  // Seed transactions for Visa
-  const now = new Date()
-  await addTx(visa.id, "PURCHASE", 125.50, "Amazon.com", new Date(now.getFullYear(), now.getMonth(), 3))
-  await addTx(visa.id, "PURCHASE", 45.00, "Netflix Subscription", new Date(now.getFullYear(), now.getMonth(), 5))
-  await addTx(visa.id, "PURCHASE", 89.99, "Uber Rides", new Date(now.getFullYear(), now.getMonth(), 8))
-  await addTx(visa.id, "PURCHASE", 1200.00, "MacBook Pro 14", new Date(now.getFullYear(), now.getMonth() - 1, 15), { installments: 12 })
+  // Seed transactions for Visa (with budget links)
+  await addTx(visa.id, "PURCHASE", 125.50, "Amazon.com", new Date(now.getFullYear(), now.getMonth(), 3), { budgetId: shoppingBudget.id })
+  await addTx(visa.id, "PURCHASE", 45.00, "Netflix Subscription", new Date(now.getFullYear(), now.getMonth(), 5), { budgetId: entertainmentBudget.id })
+  await addTx(visa.id, "PURCHASE", 89.99, "Uber Rides", new Date(now.getFullYear(), now.getMonth(), 8), { budgetId: transportBudget.id })
+  await addTx(visa.id, "PURCHASE", 1200.00, "MacBook Pro 14", new Date(now.getFullYear(), now.getMonth() - 1, 15), { installments: 12, budgetId: electronicsBudget.id })
   await addTx(visa.id, "PAYMENT", 500.00, "Payment - Thank you", new Date(now.getFullYear(), now.getMonth(), 2))
 
-  // Seed transactions for Amex
-  await addTx(amex.id, "PURCHASE", 234.80, "Whole Foods Market", new Date(now.getFullYear(), now.getMonth(), 1))
-  await addTx(amex.id, "PURCHASE", 560.00, "Delta Airlines", new Date(now.getFullYear(), now.getMonth() - 1, 20))
-  await addTx(amex.id, "PURCHASE", 75.00, "Spotify Premium", new Date(now.getFullYear(), now.getMonth(), 10))
+  // Seed transactions for Amex (with budget links)
+  await addTx(amex.id, "PURCHASE", 234.80, "Whole Foods Market", new Date(now.getFullYear(), now.getMonth(), 1), { budgetId: foodBudget.id })
+  await addTx(amex.id, "PURCHASE", 560.00, "Delta Airlines", new Date(now.getFullYear(), now.getMonth() - 1, 20), { budgetId: transportBudget.id })
+  await addTx(amex.id, "PURCHASE", 75.00, "Spotify Premium", new Date(now.getFullYear(), now.getMonth(), 10), { budgetId: entertainmentBudget.id })
   await addTx(amex.id, "PAYMENT", 600.00, "Online Payment", new Date(now.getFullYear(), now.getMonth(), 8))
 
-  // Seed transactions for Mastercard
-  await addTx(mastercard.id, "PURCHASE", 250000, "Éxito Supermarket", new Date(now.getFullYear(), now.getMonth(), 2))
-  await addTx(mastercard.id, "PURCHASE", 120000, "Rappi Food", new Date(now.getFullYear(), now.getMonth(), 5))
-  await addTx(mastercard.id, "PURCHASE", 1500000, "iPhone 16", new Date(now.getFullYear(), now.getMonth() - 1, 25), { installments: 24 })
-  await addTx(mastercard.id, "PURCHASE", 85000, "Netflix + Prime Video", new Date(now.getFullYear(), now.getMonth(), 7))
+  // Seed transactions for Mastercard (with budget links)
+  await addTx(mastercard.id, "PURCHASE", 250000, "Éxito Supermarket", new Date(now.getFullYear(), now.getMonth(), 2), { budgetId: foodBudget.id })
+  await addTx(mastercard.id, "PURCHASE", 120000, "Rappi Food", new Date(now.getFullYear(), now.getMonth(), 5), { budgetId: foodBudget.id })
+  await addTx(mastercard.id, "PURCHASE", 1500000, "iPhone 16", new Date(now.getFullYear(), now.getMonth() - 1, 25), { installments: 24, budgetId: electronicsBudget.id })
+  await addTx(mastercard.id, "PURCHASE", 85000, "Netflix + Prime Video", new Date(now.getFullYear(), now.getMonth(), 7), { budgetId: entertainmentBudget.id })
   await addTx(mastercard.id, "PAYMENT", 500000, "Pago en línea", new Date(now.getFullYear(), now.getMonth(), 1))
+
+  // Recalculate budget spent from linked transactions
+  const allBudgets = [foodBudget, shoppingBudget, entertainmentBudget, transportBudget, electronicsBudget]
+  for (const budget of allBudgets) {
+    const txs = await prisma.transaction.findMany({ where: { budgetId: budget.id } })
+    const spent = txs.reduce((sum, tx) => {
+      const delta = tx.type === "PAYMENT" ? -Number(tx.amount) : Number(tx.amount)
+      return sum + delta
+    }, 0)
+    await prisma.budget.update({
+      where: { id: budget.id },
+      data: { spent: Math.max(0, spent) },
+    })
+  }
 
   console.log(`Seeded ${currencies.length} currencies`)
   console.log(`Seeded user: ${user.email} / password123`)
   console.log(`Seeded 3 cards with ${await prisma.transaction.count()} transactions`)
+  console.log(`Seeded ${allBudgets.length} budgets`)
 }
 
 main()

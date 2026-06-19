@@ -28,6 +28,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
         date: transaction.date,
         currency: transaction.currency,
         isInstallment: transaction.isInstallment,
+        budgetId: transaction.budgetId ?? null,
       },
       create: {
         id: transaction.id,
@@ -38,6 +39,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
         date: transaction.date,
         currency: transaction.currency,
         isInstallment: transaction.isInstallment,
+        budgetId: transaction.budgetId ?? null,
       },
     })
   }
@@ -55,6 +57,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
     date: Date
     currency: string
     isInstallment: boolean
+    budgetId: string | null
     createdAt: Date
   }): Transaction {
     const toNum = (v: { toNumber?: () => number } | number): number =>
@@ -69,6 +72,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
       date: record.date,
       currency: record.currency,
       isInstallment: record.isInstallment,
+      budgetId: record.budgetId ?? undefined,
       createdAt: record.createdAt,
     })
   }

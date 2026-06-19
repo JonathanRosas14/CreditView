@@ -1,12 +1,3 @@
-function getLastFour(id: string): string {
-  let hash = 0
-  for (let i = 0; i < id.length; i++) {
-    hash = (hash * 31 + id.charCodeAt(i)) & 0xffff
-  }
-  const num = (Math.abs(hash) % 9000 + 1000).toString()
-  return num
-}
-
 const gradients: [string, string][] = [
   ["#002434", "#1A4A5E"],
   ["#1A3A4A", "#2C4A5B"],
@@ -15,7 +6,6 @@ const gradients: [string, string][] = [
 
 export function CardVisual({ card, index }: { card: { id: string; bank: string; name: string }; index: number }) {
   const [colorA, colorB] = gradients[index % gradients.length]
-  const lastFour = getLastFour(card.id)
 
   return (
     <div
@@ -101,7 +91,7 @@ export function CardVisual({ card, index }: { card: { id: string; bank: string; 
             fontWeight: 400,
           }}
         >
-          &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; {lastFour}
+          &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; XXXX
         </p>
       </div>
     </div>

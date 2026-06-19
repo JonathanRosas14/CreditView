@@ -22,7 +22,7 @@ export async function createTransactionAction(
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" }
   }
 
-  const { cardId, type, amount, description, date: dateStr, installments } = parsed.data
+  const { cardId, type, amount, description, date: dateStr, installments, budgetId } = parsed.data
 
   try {
     const cardRecord = await cardRepo.findById(cardId)
@@ -37,6 +37,7 @@ export async function createTransactionAction(
       date: new Date(dateStr),
       currency: cardRecord.currencyCode,
       isInstallment: installments > 1,
+      budgetId: budgetId || undefined,
     })
 
     if (type === "PAYMENT") {
@@ -47,6 +48,23 @@ export async function createTransactionAction(
 
     await cardRepo.save(cardRecord)
     await txRepo.save(tx)
+
+    let warning: string | null = null
+    if (budgetId) {
+      const delta = type === "PAYMENT" ? -amount : amount
+      const budget = await prisma.budget.findUnique({ where: { id: budgetId } })
+      if (budget && budget.userId === user.id) {
+        const newSpent = Number(budget.spent) + delta
+        await prisma.budget.update({
+          where: { id: budgetId },
+          data: { spent: newSpent },
+        })
+        if (newSpent > Number(budget.amount)) {
+          const excess = Math.abs(Number(budget.amount) - newSpent)
+          warning = `Warning: This transaction will exceed your ${budget.category} budget by $${excess.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+        }
+      }
+    }
 
     await logAuditEvent({
       userId: user.id,
@@ -61,6 +79,7 @@ export async function createTransactionAction(
         description,
         date: dateStr,
         isInstallment: installments > 1,
+        budgetId: budgetId || undefined,
       },
     })
 
@@ -85,8 +104,8 @@ export async function createTransactionAction(
     }
 
     revalidatePath(`/cards/${cardId}`)
-    return { success: true, error: null }
+    return { success: true, error: null, warning }
   } catch (e) {
-    return { success: false, error: (e as Error).message }
+    return { success: false, error: (e as Error).message, warning: null }
   }
 }

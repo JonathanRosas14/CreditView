@@ -2,13 +2,16 @@
 
 import { useActionState, useState } from "react"
 import { createTransactionAction } from "@/actions/transactions"
+import { BudgetSelector, type BudgetOption } from "./budget-selector"
 
-export function TransactionForm({ cardId }: { cardId: string }) {
+export function TransactionForm({ cardId, budgets }: { cardId: string; budgets: BudgetOption[] }) {
   const [state, formAction, pending] = useActionState(createTransactionAction, {
     success: false,
     error: null,
+    warning: null,
   })
   const [hasInstallments, setHasInstallments] = useState(false)
+  const [budgetId, setBudgetId] = useState("")
 
   if (state?.success) {
     return (
@@ -21,6 +24,7 @@ export function TransactionForm({ cardId }: { cardId: string }) {
   return (
     <form action={formAction} className="space-y-4">
       <input type="hidden" name="cardId" value={cardId} />
+      <input type="hidden" name="budgetId" value={budgetId} />
 
       <div className="grid grid-cols-2 gap-4">
         <label className="flex flex-col gap-1">
@@ -86,6 +90,26 @@ export function TransactionForm({ cardId }: { cardId: string }) {
           </select>
         </label>
       </div>
+
+      <BudgetSelector budgets={budgets} value={budgetId} onChange={setBudgetId} />
+
+      {state?.warning && (
+        <div
+          style={{
+            backgroundColor: "#FEF3C7",
+            border: "1px solid #F59E0B",
+            borderRadius: 8,
+            padding: "10px 14px",
+            fontFamily: "var(--font-dm-sans)",
+            fontSize: 13,
+            fontWeight: 500,
+            lineHeight: "18px",
+            color: "#92400E",
+          }}
+        >
+          {state.warning}
+        </div>
+      )}
 
       {state?.error && <p className="text-sm text-red-500">{state.error}</p>}
 

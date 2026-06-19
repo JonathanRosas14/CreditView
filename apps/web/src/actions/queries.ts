@@ -26,10 +26,15 @@ export async function getCardTransactions(cardId: string) {
   return txRepo.findByCardId(cardId)
 }
 
-export async function getRecentTransactions(limit = 8) {
-  const user = await verifySession()
-  const cards = await cardRepo.findByUserId(user.id)
-  const cardIds = cards.map((c) => c.id)
+export async function getRecentTransactions(limit: number): Promise<RecentTransaction[]>
+export async function getRecentTransactions(limit: number, cardIds: string[]): Promise<RecentTransaction[]>
+export async function getRecentTransactions(limit = 8, cardIds?: string[]): Promise<RecentTransaction[]> {
+  if (!cardIds || cardIds.length === 0) {
+    const user = await verifySession()
+    const cards = await cardRepo.findByUserId(user.id)
+    cardIds = cards.map((c) => c.id)
+  }
+
   if (cardIds.length === 0) return []
 
   const records = await prisma.transaction.findMany({
@@ -51,6 +56,17 @@ export async function getRecentTransactions(limit = 8) {
   }))
 }
 
+export type RecentTransaction = {
+  id: string
+  description: string
+  amount: number
+  currency: string
+  type: string
+  date: Date
+  cardName: string
+  cardId: string
+}
+
 function deriveCategory(description: string): string {
   const desc = description.toLowerCase()
   if (desc.includes("amazon") || desc.includes("apple") || desc.includes("macbook") || desc.includes("iphone") || desc.includes("electronics")) return "ELECTRONICS"
@@ -63,23 +79,42 @@ function deriveCategory(description: string): string {
   return "OTHER"
 }
 
-export async function getAllTransactions(page = 1, pageSize = 10) {
+export async function getAllTransactions(
+  page = 1,
+  pageSize = 10,
+  filters?: { cardId?: string; dateFrom?: string; dateTo?: string; search?: string },
+) {
   const user = await verifySession()
   const cards = await cardRepo.findByUserId(user.id)
   const cardIds = cards.map((c) => c.id)
   if (cardIds.length === 0) return { transactions: [], total: 0, page, pageSize, totalPages: 0 }
 
+  const where: Record<string, unknown> = { cardId: { in: cardIds } }
+
+  if (filters?.cardId) {
+    where.cardId = filters.cardId
+  }
+
+  if (filters?.dateFrom || filters?.dateTo) {
+    const dateFilter: Record<string, Date> = {}
+    if (filters.dateFrom) dateFilter.gte = new Date(filters.dateFrom)
+    if (filters.dateTo) dateFilter.lte = new Date(filters.dateTo + "T23:59:59.999Z")
+    where.date = dateFilter
+  }
+
+  if (filters?.search) {
+    where.description = { contains: filters.search, mode: "insensitive" }
+  }
+
   const [records, total] = await Promise.all([
     prisma.transaction.findMany({
-      where: { cardId: { in: cardIds } },
+      where,
       orderBy: { date: "desc" },
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: { card: { select: { name: true } } },
     }),
-    prisma.transaction.count({
-      where: { cardId: { in: cardIds } },
-    }),
+    prisma.transaction.count({ where }),
   ])
 
   const transactions = records.map((r) => ({
@@ -103,3 +138,5 @@ export async function getAllTransactions(page = 1, pageSize = 10) {
     totalPages: Math.ceil(total / pageSize),
   }
 }
+
+export type { Card } from "@creditview/core"

@@ -1,8 +1,11 @@
 import type { Metadata } from "next"
 import { getCard, getCardTransactions } from "@/actions/queries"
+import { getBudgets } from "@/actions/budgets"
 import { notFound } from "next/navigation"
 import Link from "next/link"
+import { auth } from "@/lib/auth"
 import { TransactionForm } from "@/components/transaction-form"
+import type { BudgetOption } from "@/components/budget-selector"
 import { DeleteCardButton } from "../delete-card-button"
 
 export const metadata: Metadata = { title: "Card Details" }
@@ -13,7 +16,7 @@ function formatCurrency(amount: number, currencyCode: string) {
 }
 
 function formatDate(date: Date) {
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })
 }
 
 export default async function CardDetailPage({
@@ -22,12 +25,25 @@ export default async function CardDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const [card, transactions] = await Promise.all([
+  const session = await auth()
+  const [card, transactions, rawBudgets] = await Promise.all([
     getCard(id),
     getCardTransactions(id),
+    getBudgets(),
   ])
 
   if (!card) notFound()
+
+  const budgets: BudgetOption[] = rawBudgets.map((b) => ({
+    id: b.id,
+    category: b.category,
+    amount: b.amount,
+    spent: b.spent,
+    period: b.period,
+    cardName: b.card?.name ?? null,
+  }))
+
+  const userName = session?.user?.name ?? "CARDHOLDER"
 
   return (
     <div className="space-y-8">
@@ -146,7 +162,7 @@ export default async function CardDetailPage({
               color: "#FFFFFF",
             }}
           >
-            &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; {id.slice(-4)}
+            &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; XXXX
           </p>
         </div>
         <div className="mt-8 flex items-center justify-between" style={{ position: "relative", zIndex: 1 }}>
@@ -159,7 +175,7 @@ export default async function CardDetailPage({
               fontWeight: 500,
             }}
           >
-            ALEX STERLING
+            {userName.toUpperCase()}
           </span>
           <span
             className="text-xs"
@@ -170,7 +186,7 @@ export default async function CardDetailPage({
               fontWeight: 400,
             }}
           >
-            12/28
+            XX/XX
           </span>
         </div>
       </div>
@@ -320,7 +336,7 @@ export default async function CardDetailPage({
             >
               Add Transaction
             </h2>
-            <TransactionForm cardId={card.id} />
+            <TransactionForm cardId={card.id} budgets={budgets} />
           </div>
         </div>
       </div>

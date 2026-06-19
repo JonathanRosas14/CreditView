@@ -171,7 +171,7 @@ export function EditCardForm({
               name="cutoffDay"
               type="number"
               min="1"
-              max="31"
+              max="30"
               required
               defaultValue={defaultValues.cutoffDay}
               className="w-full border bg-white px-4 py-3 text-sm outline-none transition-colors"
@@ -195,7 +195,7 @@ export function EditCardForm({
               name="paymentDay"
               type="number"
               min="1"
-              max="31"
+              max="30"
               required
               defaultValue={defaultValues.paymentDay}
               className="w-full border bg-white px-4 py-3 text-sm outline-none transition-colors"

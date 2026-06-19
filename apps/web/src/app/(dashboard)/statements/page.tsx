@@ -167,7 +167,7 @@ export default async function StatementsPage() {
                               fontWeight: 400,
                             }}
                           >
-                            ACCOUNT NO. &bull;&bull;&bull;&bull; {s.cardId.slice(-4)}
+                            ACCOUNT NO. &bull;&bull;&bull;&bull; XXXX
                           </p>
                           <h3
                             className="text-lg"

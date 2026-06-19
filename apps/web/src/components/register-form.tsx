@@ -32,6 +32,7 @@ export function RegisterForm() {
     error: "",
   })
   const [password, setPassword] = useState("")
+  const [termsAccepted, setTermsAccepted] = useState(false)
 
   return (
     <form action={formAction} className="w-full max-w-[448px]">
@@ -142,19 +143,30 @@ export function RegisterForm() {
           />
         </label>
 
-        <label className="flex cursor-pointer items-center gap-3">
+        <label className="relative flex cursor-pointer items-center gap-3">
           <input
             name="terms"
             type="checkbox"
             required
-            className="h-4 w-4 appearance-none rounded border bg-white"
-            style={{
-              borderColor: "#C2C7CC",
-              borderRadius: "4px",
-            }}
+            checked={termsAccepted}
+            onChange={(e) => setTermsAccepted(e.target.checked)}
+            className="absolute inset-0 z-10 h-full w-full opacity-0"
           />
           <span
-            className="text-[13px] leading-[18.2px]"
+            className="pointer-events-none flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors"
+            style={{
+              borderColor: termsAccepted ? "#002434" : "#C2C7CC",
+              backgroundColor: termsAccepted ? "#002434" : "#FFFFFF",
+            }}
+          >
+            {termsAccepted && (
+              <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </span>
+          <span
+            className="pointer-events-none text-[13px] leading-[18.2px]"
             style={{ color: "#42474B", fontFamily: "var(--font-dm-sans)" }}
           >
             I agree to the{" "}

@@ -12,6 +12,7 @@ export type TransactionProps = {
   date: Date
   currency: string
   isInstallment: boolean
+  budgetId?: string
   createdAt: Date
 }
 
@@ -38,5 +39,6 @@ export class Transaction {
   get date(): Date { return this.props.date }
   get currency(): string { return this.props.currency }
   get isInstallment(): boolean { return this.props.isInstallment }
+  get budgetId(): string | undefined { return this.props.budgetId }
   get createdAt(): Date { return this.props.createdAt }
 }

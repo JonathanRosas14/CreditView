@@ -8,7 +8,7 @@ import { DeleteCardButton } from "./delete-card-button"
 export const metadata: Metadata = { title: "Cards" }
 
 function formatDate(date: Date) {
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })
 }
 
 function formatCurrency(amount: number) {
@@ -17,7 +17,8 @@ function formatCurrency(amount: number) {
 
 export default async function CardsPage() {
   const cards = await getCards()
-  const recentTransactions = await getRecentTransactions(5)
+  const cardIds = cards.map((c) => c.id)
+  const recentTransactions = await getRecentTransactions(5, cardIds)
 
   return (
     <div className="space-y-12">
@@ -116,47 +117,57 @@ export default async function CardsPage() {
                 >
                   <CardVisual card={{ id: card.id, bank: card.bank, name: card.name }} index={index} />
                 </Link>
-                <div className="mt-3 flex items-start justify-between">
-                  <div>
+                <div className="mt-4 space-y-3">
+                  <div className="flex items-start justify-between">
                     <p
-                      className="text-sm font-medium"
-                      style={{ fontFamily: "var(--font-dm-sans)", color: "#002434", lineHeight: "20px" }}
+                      style={{
+                        fontFamily: "var(--font-dm-sans)",
+                        fontWeight: 500,
+                        fontSize: 16,
+                        lineHeight: "24px",
+                        color: "#002434",
+                      }}
                     >
                       {card.name}
                     </p>
-                    <p
-                      className="text-[11px]"
-                      style={{ fontFamily: "var(--font-dm-sans)", color: "#72787C", lineHeight: "16px" }}
-                    >
-                      {card.bank} &middot; ${card.totalLimit.amount.toLocaleString()} limit
-                    </p>
-                    <div
-                      className="mt-2 h-1 w-full overflow-hidden rounded-full"
-                      style={{ backgroundColor: "#E5E5E1" }}
-                    >
-                      <div
-                        className="h-full rounded-full"
+                    <div className="flex items-center gap-3 shrink-0 ml-3">
+                      <Link
+                        href={`/cards/${card.id}/edit`}
+                        className="text-[11px] uppercase no-underline"
                         style={{
-                          width: `${Math.min((card.usedBalance.amount / card.totalLimit.amount) * 100, 100)}%`,
-                          backgroundColor: "#002434",
+                          fontFamily: "var(--font-dm-sans)",
+                          color: "#72787C",
+                          letterSpacing: "1.1px",
+                          fontWeight: 400,
                         }}
-                      />
+                      >
+                        EDIT
+                      </Link>
+                      <DeleteCardButton cardId={card.id} />
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 shrink-0 ml-3">
-                    <Link
-                      href={`/cards/${card.id}/edit`}
-                      className="text-[11px] uppercase no-underline"
+                  <p
+                    style={{
+                      fontFamily: "var(--font-dm-sans)",
+                      fontWeight: 400,
+                      fontSize: 13,
+                      lineHeight: "18px",
+                      color: "#72787C",
+                    }}
+                  >
+                    {card.bank} &middot; {card.currencyCode} {card.totalLimit.amount.toLocaleString("en-US")}
+                  </p>
+                  <div
+                    className="h-1 w-full overflow-hidden rounded-full"
+                    style={{ backgroundColor: "#E5E5E1" }}
+                  >
+                    <div
+                      className="h-full rounded-full"
                       style={{
-                        fontFamily: "var(--font-dm-sans)",
-                        color: "#72787C",
-                        letterSpacing: "1.1px",
-                        fontWeight: 400,
+                        width: `${Math.min((card.usedBalance.amount / card.totalLimit.amount) * 100, 100)}%`,
+                        backgroundColor: "#002434",
                       }}
-                    >
-                      EDIT
-                    </Link>
-                    <DeleteCardButton cardId={card.id} />
+                    />
                   </div>
                 </div>
               </div>
@@ -523,16 +534,15 @@ export default async function CardsPage() {
                         {tx.description}
                       </div>
                       <div
-                        className="text-[10px]"
+                        className="text-sm"
                         style={{
-                          fontFamily: "ui-monospace, 'Liberation Mono', monospace",
+                          fontFamily: "var(--font-dm-sans)",
                           color: "#42474B",
-                          lineHeight: "15px",
-                          letterSpacing: "0.5px",
+                          lineHeight: "20px",
                           fontWeight: 400,
                         }}
                       >
-                        &bull; {tx.cardId.slice(-4)}
+                        {tx.cardName}
                       </div>
                       <div
                         className="text-right text-sm font-bold"

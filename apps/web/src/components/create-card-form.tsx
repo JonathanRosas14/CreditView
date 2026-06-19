@@ -168,7 +168,7 @@ export function CreateCardForm() {
               name="cutoffDay"
               type="number"
               min="1"
-              max="31"
+              max="30"
               required
               className="w-full border bg-white px-4 py-3 text-sm outline-none transition-colors"
               style={{
@@ -191,7 +191,7 @@ export function CreateCardForm() {
               name="paymentDay"
               type="number"
               min="1"
-              max="31"
+              max="30"
               required
               className="w-full border bg-white px-4 py-3 text-sm outline-none transition-colors"
               style={{
