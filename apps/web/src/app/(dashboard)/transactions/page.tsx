@@ -96,7 +96,7 @@ export default async function TransactionsPage({
         }}
       >
         <div
-          className="grid grid-cols-12 items-center"
+          className="hidden grid-cols-12 items-center md:grid"
           style={{ backgroundColor: "#F6F3F2" }}
         >
           {["DATE", "MERCHANT", "CARD", "TYPE", "AMOUNT", "STATUS"].map((header) => (
@@ -140,101 +140,159 @@ export default async function TransactionsPage({
             return (
               <div
                 key={tx.id}
-                className="grid grid-cols-12 items-center"
                 style={{
-                  borderTop: i > 0 ? "1px solid rgba(194,199,204,0.3)" : "none",
-                  borderBottom: "1px solid #C2C7CC",
+                  borderBottom: "1px solid rgba(194,199,204,0.3)",
                 }}
               >
+                {/* Mobile card */}
+                <div className="flex flex-col gap-2 px-4 py-5 md:hidden">
+                  <div className="flex items-start justify-between">
+                    <span
+                      className="text-base font-medium leading-5"
+                      style={{ fontFamily: "var(--font-dm-sans)", color: "#002434", fontWeight: 500 }}
+                    >
+                      {tx.description}
+                    </span>
+                    <span
+                      className="shrink-0 text-base font-bold leading-5"
+                      style={{
+                        fontFamily: "var(--font-dm-sans)",
+                        fontWeight: 700,
+                        color: isNegative ? "#BA1A1A" : "#16A34A",
+                      }}
+                    >
+                      {isNegative ? `-${formatCurrency(tx.amount)}` : `+${formatCurrency(tx.amount)}`}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs" style={{ fontFamily: "var(--font-dm-sans)", color: "#72787C" }}>
+                    <span>{formatDate(new Date(tx.date))}</span>
+                    <span>&middot;</span>
+                    <span>{tx.cardName}</span>
+                    <span>&middot;</span>
+                    <span
+                      className="inline-block rounded-full px-2 py-0.5 text-[10px] uppercase"
+                      style={{
+                        color: "#42474B",
+                        backgroundColor: "#F0EDED",
+                        letterSpacing: "1px",
+                      }}
+                    >
+                      {tx.type === "PURCHASE" ? "COMPRA" : tx.type === "PAYMENT" ? "PAGO" : "ADELANTO"}
+                    </span>
+                    <span>&middot;</span>
+                    <span className="flex items-center gap-1">
+                      <span
+                        style={{
+                          display: "inline-block",
+                          width: "6px",
+                          height: "6px",
+                          borderRadius: "50%",
+                          backgroundColor: isCleared ? "#22C55E" : "#FBBF24",
+                        }}
+                      />
+                      {isCleared ? "Cleared" : "Pending"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Desktop row */}
                 <div
-                  className="px-8 py-6 text-base"
+                  className="hidden md:grid md:grid-cols-12 md:items-center"
                   style={{
-                    fontFamily: "var(--font-dm-sans)",
-                    color: "#42474B",
-                    lineHeight: "20px",
-                    fontWeight: 400,
-                    gridColumn: "span 1",
+                    borderTop: i > 0 ? "1px solid rgba(194,199,204,0.3)" : "none",
+                    borderBottom: "1px solid #C2C7CC",
                   }}
-                >
-                  {formatDate(new Date(tx.date))}
-                </div>
-                <div
-                  className="px-8 py-6 text-base font-medium"
-                  style={{
-                    fontFamily: "var(--font-dm-sans)",
-                    color: "#002434",
-                    lineHeight: "20px",
-                    fontWeight: 500,
-                    gridColumn: "span 3",
-                  }}
-                >
-                  {tx.description}
-                </div>
-                <div
-                  className="px-8 py-6 text-base"
-                  style={{
-                    fontFamily: "var(--font-dm-sans)",
-                    color: "#42474B",
-                    lineHeight: "20px",
-                    fontWeight: 400,
-                    gridColumn: "span 2",
-                  }}
-                >
-                  {tx.cardName}
-                </div>
-                <div
-                  className="px-8 py-6"
-                  style={{ gridColumn: "span 2" }}
-                >
-                  <span
-                    className="inline-block rounded-full px-3 py-1 text-[10px] uppercase"
-                    style={{
-                      fontFamily: "var(--font-dm-sans)",
-                      color: "#42474B",
-                      lineHeight: "15px",
-                      fontWeight: 400,
-                      backgroundColor: "#F0EDED",
-                      letterSpacing: "1px",
-                    }}
-                  >
-                    {tx.type === "PURCHASE" ? "COMPRA" : tx.type === "PAYMENT" ? "PAGO" : "ADELANTO"}
-                  </span>
-                </div>
-                <div
-                  className="px-8 py-6 text-right text-base font-bold"
-                  style={{
-                    fontFamily: "var(--font-dm-sans)",
-                    lineHeight: "20px",
-                    fontWeight: 700,
-                    color: isNegative ? "#BA1A1A" : "#16A34A",
-                    gridColumn: "span 2",
-                  }}
-                >
-                  {isNegative ? `-${formatCurrency(tx.amount)}` : `+${formatCurrency(tx.amount)}`}
-                </div>
-                <div
-                  className="flex items-center gap-2 px-8 py-6"
-                  style={{ gridColumn: "span 2" }}
                 >
                   <div
-                    style={{
-                      width: "8px",
-                      height: "8px",
-                      borderRadius: "50%",
-                      backgroundColor: isCleared ? "#22C55E" : "#FBBF24",
-                    }}
-                  />
-                  <span
-                    className="text-base"
+                    className="px-8 py-6 text-base"
                     style={{
                       fontFamily: "var(--font-dm-sans)",
                       color: "#42474B",
                       lineHeight: "20px",
                       fontWeight: 400,
+                      gridColumn: "span 1",
                     }}
                   >
-                    {isCleared ? "Cleared" : "Pending"}
-                  </span>
+                    {formatDate(new Date(tx.date))}
+                  </div>
+                  <div
+                    className="px-8 py-6 text-base font-medium"
+                    style={{
+                      fontFamily: "var(--font-dm-sans)",
+                      color: "#002434",
+                      lineHeight: "20px",
+                      fontWeight: 500,
+                      gridColumn: "span 3",
+                    }}
+                  >
+                    {tx.description}
+                  </div>
+                  <div
+                    className="px-8 py-6 text-base"
+                    style={{
+                      fontFamily: "var(--font-dm-sans)",
+                      color: "#42474B",
+                      lineHeight: "20px",
+                      fontWeight: 400,
+                      gridColumn: "span 2",
+                    }}
+                  >
+                    {tx.cardName}
+                  </div>
+                  <div
+                    className="px-8 py-6"
+                    style={{ gridColumn: "span 2" }}
+                  >
+                    <span
+                      className="inline-block rounded-full px-3 py-1 text-[10px] uppercase"
+                      style={{
+                        fontFamily: "var(--font-dm-sans)",
+                        color: "#42474B",
+                        lineHeight: "15px",
+                        fontWeight: 400,
+                        backgroundColor: "#F0EDED",
+                        letterSpacing: "1px",
+                      }}
+                    >
+                      {tx.type === "PURCHASE" ? "COMPRA" : tx.type === "PAYMENT" ? "PAGO" : "ADELANTO"}
+                    </span>
+                  </div>
+                  <div
+                    className="px-8 py-6 text-right text-base font-bold"
+                    style={{
+                      fontFamily: "var(--font-dm-sans)",
+                      lineHeight: "20px",
+                      fontWeight: 700,
+                      color: isNegative ? "#BA1A1A" : "#16A34A",
+                      gridColumn: "span 2",
+                    }}
+                  >
+                    {isNegative ? `-${formatCurrency(tx.amount)}` : `+${formatCurrency(tx.amount)}`}
+                  </div>
+                  <div
+                    className="flex items-center gap-2 px-8 py-6"
+                    style={{ gridColumn: "span 2" }}
+                  >
+                    <div
+                      style={{
+                        width: "8px",
+                        height: "8px",
+                        borderRadius: "50%",
+                        backgroundColor: isCleared ? "#22C55E" : "#FBBF24",
+                      }}
+                    />
+                    <span
+                      className="text-base"
+                      style={{
+                        fontFamily: "var(--font-dm-sans)",
+                        color: "#42474B",
+                        lineHeight: "20px",
+                        fontWeight: 400,
+                      }}
+                    >
+                      {isCleared ? "Cleared" : "Pending"}
+                    </span>
+                  </div>
                 </div>
               </div>
             )

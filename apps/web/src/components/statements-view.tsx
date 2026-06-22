@@ -74,7 +74,7 @@ export function StatementsView({ statements }: { statements: MonthlyStatement[] 
               <select
                 value={selectedCard}
                 onChange={(e) => setSelectedCard(e.target.value)}
-                className="appearance-none text-[10px] uppercase outline-none"
+                className="appearance-none self-start text-[10px] uppercase outline-none sm:self-auto"
                 style={{
                   fontFamily: "var(--font-dm-sans)",
                   color: selectedCard ? "#002434" : "#002434",
@@ -103,7 +103,7 @@ export function StatementsView({ statements }: { statements: MonthlyStatement[] 
                 const csv = toCSV(filtered)
                 downloadCSV(csv, `creditview-statements-${new Date().toISOString().split("T")[0]}.csv`)
               }}
-              className="inline-flex items-center gap-2 text-[10px] uppercase"
+              className="inline-flex items-center justify-center gap-2 self-start whitespace-nowrap text-[10px] uppercase sm:self-auto"
               style={{
                 fontFamily: "var(--font-dm-sans)",
                 color: "#FFFFFF",

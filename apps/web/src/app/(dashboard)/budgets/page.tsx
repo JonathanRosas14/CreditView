@@ -45,6 +45,7 @@ export default async function BudgetsPage() {
         </div>
         <Link
           href="/budgets/new"
+          className="self-start whitespace-nowrap sm:self-auto"
           style={{
             fontFamily: "var(--font-dm-sans)",
             fontWeight: 700,
