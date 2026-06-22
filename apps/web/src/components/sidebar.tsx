@@ -1,7 +1,7 @@
 "use client"
 
 import { usePathname } from "next/navigation"
-import { logoutAction } from "@/actions/auth"
+import { signOut } from "next-auth/react"
 import Link from "next/link"
 import { useMobileMenu } from "@/components/mobile-menu-context"
 
@@ -184,25 +184,24 @@ export function Sidebar({ user }: { user: { name?: string | null; email?: string
         >
           {user.name ?? user.email}
         </p>
-        <form action={logoutAction}>
-          <button
-            type="submit"
-            className="mt-[7px] text-[11px] uppercase transition-opacity hover:opacity-80"
-            style={{
-              fontFamily: "var(--font-dm-sans)",
-              color: "rgba(255,255,255,0.4)",
-              lineHeight: "17.6px",
-              letterSpacing: "1.1px",
-              fontWeight: 400,
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              padding: 0,
-            }}
-          >
-            SIGN OUT
-          </button>
-        </form>
+        <button
+          type="button"
+          onClick={() => signOut({ callbackUrl: "/login" })}
+          className="mt-[7px] text-[11px] uppercase transition-opacity hover:opacity-80"
+          style={{
+            fontFamily: "var(--font-dm-sans)",
+            color: "rgba(255,255,255,0.4)",
+            lineHeight: "17.6px",
+            letterSpacing: "1.1px",
+            fontWeight: 400,
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: 0,
+          }}
+        >
+          SIGN OUT
+        </button>
       </div>
     </aside>
     </>
