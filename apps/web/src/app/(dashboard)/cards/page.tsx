@@ -23,7 +23,7 @@ export default async function CardsPage() {
 
   return (
     <div className="space-y-12">
-      <section className="flex items-end justify-between">
+      <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <Breadcrumb pages="Cards" />
           <h1
@@ -40,7 +40,7 @@ export default async function CardsPage() {
         </div>
         <Link
           href="/cards/new"
-          className="inline-flex items-center gap-2 text-xs uppercase no-underline"
+          className="inline-flex items-center gap-2 self-start text-xs uppercase no-underline sm:self-auto"
           style={{
             backgroundColor: "#002434",
             color: "#FFFFFF",
@@ -97,7 +97,7 @@ export default async function CardsPage() {
         </div>
       ) : (
         <>
-          <section className="grid grid-cols-3 gap-6">
+          <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {cards.map((card, index) => (
               <div key={card.id}>
                 <Link
@@ -182,9 +182,9 @@ export default async function CardsPage() {
               </h2>
             </div>
 
-            <div className="grid grid-cols-12 gap-6">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
               <div
-                className="col-span-8 rounded-xl border bg-white p-6"
+                className="rounded-xl border bg-white p-6 lg:col-span-8"
                 style={{ borderColor: "#E5E5E1", borderRadius: "12px" }}
               >
                 <div className="flex items-center justify-between">
@@ -344,7 +344,7 @@ export default async function CardsPage() {
                 </div>
               </div>
 
-              <div className="col-span-4 flex flex-col gap-6">
+              <div className="flex flex-col gap-6 lg:col-span-4">
                 <div
                   className="rounded-xl border bg-white p-6"
                   style={{ borderColor: "#E5E5E1", borderRadius: "12px" }}
@@ -480,7 +480,7 @@ export default async function CardsPage() {
               className="overflow-hidden rounded-xl border bg-white"
               style={{ borderColor: "#E5E5E1", borderRadius: "12px" }}
             >
-              <div className="grid grid-cols-4 gap-4 px-4 py-3">
+              <div className="hidden grid-cols-4 gap-4 px-4 py-3 sm:grid">
                 {["DATE", "MERCHANT", "CARD", "AMOUNT"].map((header) => (
                   <div
                     key={header}
@@ -508,7 +508,7 @@ export default async function CardsPage() {
                   return (
                     <div
                       key={tx.id}
-                      className="grid grid-cols-4 gap-4 border-t px-4 py-3"
+                      className="flex flex-col gap-1 border-t px-4 py-3 sm:grid sm:grid-cols-4 sm:gap-4"
                       style={{ borderColor: "rgba(194, 199, 204, 0.3)" }}
                     >
                       <div

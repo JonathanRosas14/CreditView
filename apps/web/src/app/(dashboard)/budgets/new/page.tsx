@@ -70,9 +70,9 @@ export default function NewBudgetPage() {
           backgroundColor: "#FFFFFF",
           borderRadius: 12,
           border: "1px solid #C2C7CC",
-          padding: 32,
+          padding: 24,
         }}
-        className="space-y-5"
+        className="w-full space-y-5 sm:p-8"
       >
         <label className="flex flex-col gap-1.5">
           <span

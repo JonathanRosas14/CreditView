@@ -1,7 +1,13 @@
+"use client"
+
+import { useMobileMenu } from "@/components/mobile-menu-context"
+
 export function DashboardHeader() {
+  const { toggle } = useMobileMenu()
+
   return (
     <header
-      className="fixed left-64 right-0 top-0 z-20 flex h-16 items-center px-16"
+      className="fixed left-0 right-0 top-0 z-20 flex h-16 items-center gap-4 px-4 lg:left-64 lg:px-16"
       style={{
         backgroundColor: "rgba(252, 249, 248, 0.8)",
         backdropFilter: "blur(6px)",
@@ -9,11 +15,23 @@ export function DashboardHeader() {
         borderBottom: "1px solid #C2C7CC",
       }}
     >
+      <button
+        type="button"
+        onClick={toggle}
+        className="lg:hidden shrink-0"
+        style={{ background: "none", border: "none", cursor: "pointer", padding: "4px", color: "#002434" }}
+        aria-label="Toggle menu"
+      >
+        <svg width="22" height="16" viewBox="0 0 22 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="1" y1="2" x2="21" y2="2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <line x1="1" y1="8" x2="21" y2="8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <line x1="1" y1="14" x2="21" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      </button>
+
       <div
-        className="flex items-center"
+        className="flex items-center flex-1 max-w-[448px]"
         style={{
-          maxWidth: "448px",
-          width: "100%",
           backgroundColor: "#F6F3F2",
           borderRadius: "9999px",
           paddingLeft: "40px",
@@ -37,7 +55,7 @@ export function DashboardHeader() {
         <input
           type="text"
           placeholder="Search insights\u2026"
-          className="w-full border-none bg-transparent text-base outline-none"
+          className="w-full border-none bg-transparent text-sm outline-none sm:text-base"
           style={{
             fontFamily: "var(--font-dm-sans)",
             color: "#002434",
@@ -46,7 +64,7 @@ export function DashboardHeader() {
         />
       </div>
 
-      <div className="ml-auto flex items-center gap-4">
+      <div className="ml-auto flex items-center gap-3 sm:gap-4">
         <div style={{ position: "relative" }}>
           <svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -73,7 +91,7 @@ export function DashboardHeader() {
         <div style={{ width: "1px", height: "32px", backgroundColor: "#C2C7CC" }} />
 
         <span
-          className="text-base"
+          className="hidden text-base sm:block"
           style={{ fontFamily: "var(--font-dm-sans)", color: "#42474B", lineHeight: "25.6px", fontWeight: 400 }}
         >
           ACCOUNT CENTER
@@ -86,6 +104,7 @@ export function DashboardHeader() {
             borderRadius: "9999px",
             backgroundColor: "#C2C7CC",
             overflow: "hidden",
+            flexShrink: 0,
           }}
         >
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">

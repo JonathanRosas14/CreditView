@@ -95,9 +95,9 @@ export function TransactionFilters({ cards }: { cards: CardInfo[] }) {
         : "Select date range"
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
       {/* Card select */}
-      <div className="relative" style={{ width: "236px" }}>
+      <div className="relative w-full sm:w-[236px]">
         <select
           value={cardId}
           onChange={(e) => handleCardChange(e.target.value)}
@@ -138,7 +138,7 @@ export function TransactionFilters({ cards }: { cards: CardInfo[] }) {
       </div>
 
       {/* Date range */}
-      <div ref={dateRef} className="relative" style={{ width: "280px" }}>
+      <div ref={dateRef} className="relative w-full sm:w-[280px]">
         <button
           type="button"
           onClick={() => setDateOpen(!dateOpen)}
@@ -236,7 +236,7 @@ export function TransactionFilters({ cards }: { cards: CardInfo[] }) {
       </div>
 
       {/* Search */}
-      <div className="relative flex-1" style={{ maxWidth: "379px" }}>
+      <div className="relative w-full sm:flex-1 sm:max-w-[379px]">
         <input
           type="text"
           value={search}

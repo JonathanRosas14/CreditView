@@ -61,7 +61,7 @@ export function CreateCardForm() {
       </div>
 
       <form action={formAction} className="space-y-6">
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
             <span
               className="text-xs font-bold uppercase"
@@ -105,7 +105,7 @@ export function CreateCardForm() {
           </label>
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
             <span
               className="text-xs font-bold uppercase"
@@ -156,7 +156,7 @@ export function CreateCardForm() {
           </label>
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
             <span
               className="text-xs font-bold uppercase"

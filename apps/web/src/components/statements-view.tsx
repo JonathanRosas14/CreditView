@@ -64,12 +64,12 @@ export function StatementsView({ statements }: { statements: MonthlyStatement[] 
 
   return (
     <>
-      <div className="flex items-end justify-between">
-        <div className="invisible">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="hidden sm:invisible sm:block">
           <BreadcrumbPlaceholder />
         </div>
-        <div>
-          <div className="flex items-center gap-3">
+        <div className="sm:text-right">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
             <div className="relative">
               <select
                 value={selectedCard}

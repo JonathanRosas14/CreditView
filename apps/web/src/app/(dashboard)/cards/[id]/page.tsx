@@ -178,7 +178,7 @@ export default async function CardDetailPage({
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
         {[
           { label: "TOTAL LIMIT", value: card.totalLimit.amount },
           { label: "USED", value: card.usedBalance.amount },
@@ -230,8 +230,8 @@ export default async function CardDetailPage({
         ))}
       </div>
 
-      <div className="grid grid-cols-12 gap-6">
-        <div className="col-span-7">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        <div className="lg:col-span-7">
           <div
             className="overflow-hidden rounded-xl border bg-white"
             style={{ borderColor: "#E5E5E1", borderRadius: "12px" }}
@@ -307,7 +307,7 @@ export default async function CardDetailPage({
           </div>
         </div>
 
-        <div className="col-span-5">
+        <div className="lg:col-span-5">
           <div
             className="rounded-xl border bg-white p-5"
             style={{ borderColor: "#E5E5E1", borderRadius: "12px" }}

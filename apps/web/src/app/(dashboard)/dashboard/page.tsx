@@ -108,7 +108,7 @@ export default async function DashboardPage() {
 
       <AlertBanner alerts={alerts} />
 
-      <section className="grid grid-cols-3 gap-6">
+      <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {([
           { label: "TOTAL LIMIT", value: totalLimit },
           { label: "TOTAL USED", value: totalUsed },
@@ -154,8 +154,8 @@ export default async function DashboardPage() {
         ))}
       </section>
 
-      <div className="grid grid-cols-12 gap-12">
-        <section className="col-span-8">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
+        <section className="lg:col-span-8">
           <div className="mb-4 flex items-center justify-between">
             <h2
               className="text-[20px]"
@@ -184,7 +184,7 @@ export default async function DashboardPage() {
 
           <div className="w-full">
             <div
-              className="grid grid-cols-4 px-2 pb-4"
+              className="hidden grid-cols-4 px-2 pb-4 sm:grid"
               style={{ borderBottom: "1px solid #C2C7CC" }}
             >
               {["DATE", "MERCHANT", "CARD", "AMOUNT"].map((header) => (
@@ -215,7 +215,7 @@ export default async function DashboardPage() {
                 return (
                   <div
                     key={tx.id}
-                    className="grid grid-cols-4 px-2 py-6"
+                    className="flex flex-col gap-1 px-2 py-4 sm:grid sm:grid-cols-4 sm:py-6"
                     style={{
                       borderTop: "1px solid rgba(194, 199, 204, 0.3)",
                     }}
@@ -255,7 +255,7 @@ export default async function DashboardPage() {
           </div>
         </section>
 
-        <section className="col-span-4">
+        <section className="lg:col-span-4">
           <h2
             className="mb-8 text-[20px]"
             style={{

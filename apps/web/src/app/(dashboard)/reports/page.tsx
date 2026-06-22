@@ -207,7 +207,7 @@ export default async function ReportsPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4 px-6 pb-6">
+                  <div className="grid grid-cols-3 gap-2 px-4 pb-4 sm:gap-4 sm:px-6 sm:pb-6">
                     <div>
                       <p
                         style={{
@@ -416,13 +416,8 @@ export default async function ReportsPage() {
             }}
           >
             <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 120px 140px 120px",
-                gap: 0,
-                padding: "16px 24px",
-                backgroundColor: "#F6F3F2",
-              }}
+              className="hidden grid-cols-[1fr_120px_140px_120px] px-6 py-4 sm:grid"
+              style={{ backgroundColor: "#F6F3F2" }}
             >
               {["CATEGORY", "AMOUNT", "PERCENTAGE", "TRANSACTIONS"].map((h) => (
                 <span
@@ -446,26 +441,29 @@ export default async function ReportsPage() {
               <div
                 key={cat.name}
                 style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 120px 140px 120px",
-                  gap: 0,
                   padding: "16px 24px",
                   borderTop: i > 0 ? "1px solid #C2C7CC" : "none",
                 }}
-                className="items-center"
+                className="flex flex-col gap-3 sm:grid sm:grid-cols-[1fr_120px_140px_120px] sm:items-center"
               >
+                  <div className="flex items-center justify-between sm:block">
+                    <span
+                      style={{
+                        fontFamily: "var(--font-dm-sans)",
+                        fontWeight: 500,
+                        fontSize: 16,
+                        lineHeight: "24px",
+                        color: "#002434",
+                      }}
+                    >
+                      {cat.name}
+                    </span>
+                    <span className="sm:hidden" style={{ fontFamily: "var(--font-literata)", fontWeight: 400, fontSize: 16, color: "#002434" }}>
+                      {formatFull(cat.total)}
+                    </span>
+                  </div>
                 <span
-                  style={{
-                    fontFamily: "var(--font-dm-sans)",
-                    fontWeight: 500,
-                    fontSize: 16,
-                    lineHeight: "24px",
-                    color: "#002434",
-                  }}
-                >
-                  {cat.name}
-                </span>
-                <span
+                  className="hidden sm:inline"
                   style={{
                     fontFamily: "var(--font-literata)",
                     fontWeight: 400,
@@ -517,6 +515,9 @@ export default async function ReportsPage() {
                     color: "#72787C",
                   }}
                 >
+                  <span className="sm:hidden" style={{ fontFamily: "var(--font-dm-sans)", fontWeight: 700, fontSize: 10, letterSpacing: "1px", textTransform: "uppercase", color: "#72787C", marginRight: 6 }}>
+                    TXNS:
+                  </span>
                   {cat.count}
                 </span>
               </div>
@@ -526,7 +527,7 @@ export default async function ReportsPage() {
       )}
 
       {/* Bottom Action */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <button
           style={{
             fontFamily: "var(--font-dm-sans)",

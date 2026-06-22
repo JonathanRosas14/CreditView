@@ -35,7 +35,7 @@ export default async function TransactionsPage({
 
   return (
     <div className="space-y-8">
-      <div className="flex items-end justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <Breadcrumb pages="Transactions" />
           <h1
@@ -60,7 +60,7 @@ export default async function TransactionsPage({
             Manage and monitor your latest financial activity.
           </p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           <Link
             href="/cards"
             className="inline-flex items-center gap-2 text-xs uppercase no-underline"
@@ -70,7 +70,7 @@ export default async function TransactionsPage({
               fontFamily: "var(--font-dm-sans)",
               lineHeight: "18px",
               letterSpacing: "1.2px",
-              padding: "16px 32px",
+              padding: "12px 24px",
               borderRadius: "12px",
               fontWeight: 400,
             }}
@@ -244,10 +244,10 @@ export default async function TransactionsPage({
 
       {totalPages > 1 && (
         <div
-          className="flex items-center justify-between rounded-xl px-8 py-6"
+          className="flex items-center justify-center rounded-xl px-4 py-4 sm:px-8 sm:py-6"
           style={{ backgroundColor: "#F6F3F2" }}
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             {page > 1 ? (
               <Link
                 href={`/transactions?page=${page - 1}`}

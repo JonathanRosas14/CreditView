@@ -28,7 +28,7 @@ export default async function SettingsPage() {
         Settings
       </h1>
 
-      <div className="space-y-6" style={{ maxWidth: 560 }}>
+      <div className="w-full space-y-6 sm:max-w-[560px]">
         {/* Profile */}
         <div
           style={{

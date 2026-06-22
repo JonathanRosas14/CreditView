@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation"
 import { logoutAction } from "@/actions/auth"
 import Link from "next/link"
+import { useMobileMenu } from "@/components/mobile-menu-context"
 
 const navItems = [
   {
@@ -86,34 +87,60 @@ const navItems = [
 
 export function Sidebar({ user }: { user: { name?: string | null; email?: string | null } }) {
   const pathname = usePathname()
+  const { open, close } = useMobileMenu()
 
   return (
-    <aside
-      className="fixed left-0 top-0 z-30 flex h-screen w-64 flex-col"
-      style={{ backgroundColor: "#002434" }}
-    >
+    <>
+      {open && (
+        <div
+          className="fixed inset-0 z-30 bg-black/40 lg:hidden"
+          onClick={close}
+        />
+      )}
+      <aside
+        className={`fixed left-0 top-0 z-40 flex h-screen w-64 flex-col transition-transform duration-300 ${
+          open ? "translate-x-0" : "-translate-x-full"
+        } lg:translate-x-0 lg:z-30`}
+        style={{ backgroundColor: "#002434" }}
+      >
       <div
         className="px-6 pb-[33px] pt-8"
         style={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}
       >
-        <p
-          className="text-2xl -tracking-[0.6px]"
-          style={{ fontFamily: "var(--font-literata)", fontWeight: 400, color: "#FFFFFF", lineHeight: "31.2px" }}
-        >
-          CreditView
-        </p>
-        <p
-          className="mt-0 text-[10px] uppercase"
-          style={{
-            fontFamily: "var(--font-dm-sans)",
-            color: "rgba(255,255,255,0.6)",
-            lineHeight: "16px",
-            letterSpacing: "2px",
-            fontWeight: 400,
-          }}
-        >
-          PREMIUM INTELLIGENCE
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <p
+              className="text-2xl -tracking-[0.6px]"
+              style={{ fontFamily: "var(--font-literata)", fontWeight: 400, color: "#FFFFFF", lineHeight: "31.2px" }}
+            >
+              CreditView
+            </p>
+            <p
+              className="mt-0 text-[10px] uppercase"
+              style={{
+                fontFamily: "var(--font-dm-sans)",
+                color: "rgba(255,255,255,0.6)",
+                lineHeight: "16px",
+                letterSpacing: "2px",
+                fontWeight: 400,
+              }}
+            >
+              PREMIUM INTELLIGENCE
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={close}
+            className="lg:hidden text-white/60 hover:text-white"
+            style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
+            aria-label="Close menu"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line x1="4" y1="4" x2="16" y2="16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <line x1="16" y1="4" x2="4" y2="16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <nav className="flex-1 space-y-1 px-3 pt-3">
@@ -178,5 +205,6 @@ export function Sidebar({ user }: { user: { name?: string | null; email?: string
         </form>
       </div>
     </aside>
+    </>
   )
 }
