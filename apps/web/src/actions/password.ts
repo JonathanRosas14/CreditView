@@ -46,7 +46,7 @@ export async function forgotPasswordAction(
     success: true,
     error: null,
     message: "Reset link generated (MVP):",
-    resetLink: `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/reset-password?token=${token}`,
+    resetLink: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://creditview.vercel.app"}/reset-password?token=${token}`,
   }
 }
 
