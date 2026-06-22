@@ -12,7 +12,7 @@ export function LoginForm() {
   return (
     <form action={formAction} className="w-full max-w-[384px]">
       <h1
-        className="text-[48px] leading-[52.8px] -tracking-[0.96px]"
+        className="text-[32px] leading-[38px] -tracking-[0.64px] sm:text-[48px] sm:leading-[52.8px] sm:-tracking-[0.96px]"
         style={{ fontFamily: "var(--font-literata)", color: "#002434" }}
       >
         Welcome back

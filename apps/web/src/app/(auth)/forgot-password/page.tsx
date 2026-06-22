@@ -30,7 +30,7 @@ export default function ForgotPasswordPage() {
       <main className="flex flex-1 items-center justify-center px-5">
         <ForgotPasswordForm />
       </main>
-      <footer className="px-16 pb-12 pt-2 text-center">
+      <footer className="px-4 pb-8 pt-2 text-center sm:px-8 lg:px-16 lg:pb-12">
         <div className="mx-auto h-px w-full max-w-[448px]" style={{ backgroundColor: "#C2C7CC" }} />
         <p
           className="pt-5 text-[13px] leading-[18.2px]"

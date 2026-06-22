@@ -43,7 +43,7 @@ export function RegisterForm() {
         START TRACKING YOUR CREDIT CARDS
       </p>
       <h1
-        className="mt-[15px] text-[48px] leading-[52.8px] -tracking-[0.96px]"
+        className="mt-[15px] text-[32px] leading-[38px] -tracking-[0.64px] sm:text-[48px] sm:leading-[52.8px] sm:-tracking-[0.96px]"
         style={{ fontFamily: "var(--font-literata)", fontWeight: 400, color: "#002434" }}
       >
         Create your

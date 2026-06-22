@@ -33,7 +33,7 @@ export function ForgotPasswordForm() {
       {isSuccess ? (
         <div className="text-center">
           <h1
-            className="text-[48px] leading-[52.8px] -tracking-[0.96px]"
+            className="text-[32px] leading-[38px] -tracking-[0.64px] sm:text-[48px] sm:leading-[52.8px] sm:-tracking-[0.96px]"
             style={{ fontFamily: "var(--font-literata)", color: "#002434" }}
           >
             Check your email
@@ -49,7 +49,7 @@ export function ForgotPasswordForm() {
       ) : (
         <form action={formAction}>
           <h1
-            className="text-center text-[48px] leading-[52.8px] -tracking-[0.96px]"
+            className="text-center text-[28px] leading-[34px] -tracking-[0.56px] sm:text-[48px] sm:leading-[52.8px] sm:-tracking-[0.96px]"
             style={{ fontFamily: "var(--font-literata)", color: "#002434" }}
           >
             Reset your password

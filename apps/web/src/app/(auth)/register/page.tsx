@@ -9,7 +9,7 @@ export default function RegisterPage() {
   return (
     <div className="flex min-h-screen flex-col bg-[#FCF9F8]">
       <nav
-        className="flex h-[65px] items-center justify-between px-16"
+        className="flex h-[65px] items-center justify-between px-4 md:px-8 lg:px-16"
         style={{ borderBottom: "1px solid #C2C7CC" }}
       >
         <span
@@ -26,11 +26,11 @@ export default function RegisterPage() {
           SIGN IN
         </Link>
       </nav>
-      <div className="flex flex-1 items-center py-20">
-        <div className="w-[533px] shrink-0 pl-16">
+      <div className="flex flex-1 flex-col items-center gap-8 px-4 py-10 lg:flex-row lg:px-0 lg:py-20">
+        <div className="w-full max-w-[533px] shrink-0 lg:pl-16">
           <RegisterForm />
         </div>
-        <div className="flex flex-1 items-center justify-center">
+        <div className="hidden flex-1 items-center justify-center lg:flex">
           <div
             className="relative overflow-hidden"
             style={{
