@@ -177,7 +177,7 @@ export default async function TransactionsPage({
                         letterSpacing: "1px",
                       }}
                     >
-                      {tx.type === "PURCHASE" ? "COMPRA" : tx.type === "PAYMENT" ? "PAGO" : "ADELANTO"}
+                      {tx.type === "PURCHASE" ? "PURCHASE" : tx.type === "PAYMENT" ? "PAYMENT" : "ADVANCE"}
                     </span>
                     <span>&middot;</span>
                     <span className="flex items-center gap-1">
@@ -254,7 +254,7 @@ export default async function TransactionsPage({
                         letterSpacing: "1px",
                       }}
                     >
-                      {tx.type === "PURCHASE" ? "COMPRA" : tx.type === "PAYMENT" ? "PAGO" : "ADELANTO"}
+                      {tx.type === "PURCHASE" ? "PURCHASE" : tx.type === "PAYMENT" ? "PAYMENT" : "ADVANCE"}
                     </span>
                   </div>
                   <div
