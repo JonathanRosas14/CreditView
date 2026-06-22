@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { getStatements } from "@/actions/statements"
+import { Breadcrumb } from "@/components/breadcrumb"
 
 export const metadata: Metadata = { title: "Statements" }
 
@@ -32,13 +33,7 @@ export default async function StatementsPage() {
     <div className="space-y-12">
       <div className="flex items-end justify-between">
         <div>
-          <div className="flex items-center gap-2 text-[10px] uppercase" style={{ fontFamily: "var(--font-dm-sans)", fontWeight: 400, lineHeight: "15px", letterSpacing: "1px" }}>
-            <span style={{ color: "#72787C" }}>FINANCE</span>
-            <svg width="4" height="7" viewBox="0 0 4 7" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M1 0.5L3.5 3.5L1 6.5" stroke="#72787C" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <span style={{ color: "#002434" }}>STATEMENTS</span>
-          </div>
+          <Breadcrumb pages="Statements" />
           <h1
             className="text-[32px]"
             style={{

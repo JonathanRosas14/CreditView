@@ -7,6 +7,7 @@ import { getAlerts } from "@/actions/alerts"
 import { getRecentTransactions, type RecentTransaction } from "@/actions/queries"
 import { prisma } from "@creditview/database"
 import { AlertBanner } from "@/components/alert-banner"
+import { Breadcrumb } from "@/components/breadcrumb"
 
 const cardRepo = new PrismaCardRepository()
 const txRepo = new PrismaTransactionRepository()
@@ -80,6 +81,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-12">
       <section>
+        <Breadcrumb pages="Dashboard" />
         <h1
           className="text-[32px]"
           style={{

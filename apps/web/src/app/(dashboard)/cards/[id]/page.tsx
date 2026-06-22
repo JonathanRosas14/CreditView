@@ -6,6 +6,7 @@ import Link from "next/link"
 import { auth } from "@/lib/auth"
 import { TransactionForm } from "@/components/transaction-form"
 import type { BudgetOption } from "@/components/budget-selector"
+import { Breadcrumb } from "@/components/breadcrumb"
 import { DeleteCardButton } from "../delete-card-button"
 
 export const metadata: Metadata = { title: "Card Details" }
@@ -49,21 +50,7 @@ export default async function CardDetailPage({
     <div className="space-y-8">
       <div>
         <div className="flex items-center justify-between">
-          <Link
-            href="/cards"
-            className="inline-flex items-center gap-1 text-xs uppercase no-underline"
-            style={{
-              fontFamily: "var(--font-dm-sans)",
-              color: "#002434",
-              letterSpacing: "1.1px",
-              fontWeight: 400,
-            }}
-          >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M7.5 9L4.5 6L7.5 3" stroke="#002434" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            BACK TO CARDS
-          </Link>
+          <Breadcrumb pages={["Cards", card.name]} />
           <div className="flex items-center gap-3">
             <Link
               href={`/cards/${card.id}/edit`}

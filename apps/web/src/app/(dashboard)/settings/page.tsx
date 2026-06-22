@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { DeleteAccountButton } from "./delete-account-button"
+import { Breadcrumb } from "@/components/breadcrumb"
 
 export const metadata: Metadata = { title: "Settings" }
 
@@ -14,6 +15,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="space-y-8">
+      <Breadcrumb pages="Settings" />
       <h1
         style={{
           fontFamily: "var(--font-literata)",

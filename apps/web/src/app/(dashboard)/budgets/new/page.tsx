@@ -2,6 +2,7 @@
 
 import { useActionState } from "react"
 import { createBudgetAction } from "@/actions/budgets"
+import { Breadcrumb } from "@/components/breadcrumb"
 
 export default function NewBudgetPage() {
   const [state, formAction, pending] = useActionState(createBudgetAction, {
@@ -12,7 +13,8 @@ export default function NewBudgetPage() {
   if (state?.success) {
     return (
       <div className="space-y-8">
-        <h1
+      <Breadcrumb pages="New Budget" />
+      <h1
           style={{
             fontFamily: "var(--font-literata)",
             fontWeight: 400,

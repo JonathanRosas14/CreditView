@@ -3,6 +3,7 @@ import Link from "next/link"
 import { getCards } from "@/actions/queries"
 import { getRecentTransactions } from "@/actions/queries"
 import { CardVisual } from "@/components/card-visual"
+import { Breadcrumb } from "@/components/breadcrumb"
 import { DeleteCardButton } from "./delete-card-button"
 
 export const metadata: Metadata = { title: "Cards" }
@@ -24,18 +25,7 @@ export default async function CardsPage() {
     <div className="space-y-12">
       <section className="flex items-end justify-between">
         <div>
-          <p
-            className="text-xs font-bold uppercase"
-            style={{
-              fontFamily: "var(--font-dm-sans)",
-              color: "#85A4B7",
-              lineHeight: "12px",
-              letterSpacing: "1.8px",
-              fontWeight: 700,
-            }}
-          >
-            MANAGE ACCOUNTS
-          </p>
+          <Breadcrumb pages="Cards" />
           <h1
             className="mt-2 text-[32px]"
             style={{

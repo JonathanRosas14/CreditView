@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { getBudgets } from "@/actions/budgets"
 import Link from "next/link"
 import { DeleteBudgetButton } from "./delete-budget-button"
+import { Breadcrumb } from "@/components/breadcrumb"
 
 export const metadata: Metadata = { title: "Budgets" }
 
@@ -18,6 +19,7 @@ export default async function BudgetsPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
+          <Breadcrumb pages="Budgets" />
           <h1
             style={{
               fontFamily: "var(--font-literata)",

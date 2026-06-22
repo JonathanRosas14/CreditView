@@ -3,6 +3,7 @@ import Link from "next/link"
 import { getAllTransactions, getCards } from "@/actions/queries"
 import { ExportButton } from "./export-button"
 import { TransactionFilters } from "@/components/transaction-filters"
+import { Breadcrumb } from "@/components/breadcrumb"
 
 export const metadata: Metadata = { title: "Transactions" }
 
@@ -36,6 +37,7 @@ export default async function TransactionsPage({
     <div className="space-y-8">
       <div className="flex items-end justify-between">
         <div>
+          <Breadcrumb pages="Transactions" />
           <h1
             className="text-[32px]"
             style={{

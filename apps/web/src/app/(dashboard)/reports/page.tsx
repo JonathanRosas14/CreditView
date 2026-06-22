@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { getCards } from "@/actions/queries"
 import { prisma } from "@creditview/database"
 import { verifySession } from "@/lib/dal"
+import { Breadcrumb } from "@/components/breadcrumb"
 
 export const metadata: Metadata = { title: "Reports" }
 
@@ -95,6 +96,7 @@ export default async function ReportsPage() {
     <div className="space-y-8">
       {/* Header */}
       <div>
+        <Breadcrumb pages="Reports" />
         <h1
           style={{
             fontFamily: "var(--font-literata)",
