@@ -5,6 +5,12 @@ import { useCallback, useEffect, useRef, useState } from "react"
 
 type CardInfo = { id: string; name: string; bank: string }
 
+function fmt(d: string) {
+  if (!d) return ""
+  const [y, m, day] = d.split("-")
+  return `${day}/${m}/${y}`
+}
+
 export function TransactionFilters({ cards }: { cards: CardInfo[] }) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -13,7 +19,9 @@ export function TransactionFilters({ cards }: { cards: CardInfo[] }) {
   const [dateFrom, setDateFrom] = useState(searchParams.get("dateFrom") || "")
   const [dateTo, setDateTo] = useState(searchParams.get("dateTo") || "")
   const [search, setSearch] = useState(searchParams.get("search") || "")
+  const [dateOpen, setDateOpen] = useState(false)
   const searchTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const dateRef = useRef<HTMLDivElement>(null)
 
   const buildHref = useCallback(
     (overrides: Record<string, string>) => {
@@ -68,6 +76,24 @@ export function TransactionFilters({ cards }: { cards: CardInfo[] }) {
     }
   }, [])
 
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (dateRef.current && !dateRef.current.contains(e.target as Node)) {
+        setDateOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClick)
+    return () => document.removeEventListener("mousedown", handleClick)
+  }, [])
+
+  const rangeText = dateFrom && dateTo
+    ? `${fmt(dateFrom)} – ${fmt(dateTo)}`
+    : dateFrom
+      ? `From ${fmt(dateFrom)}`
+      : dateTo
+        ? `Until ${fmt(dateTo)}`
+        : "Select date range"
+
   return (
     <div className="flex items-center gap-4">
       {/* Card select */}
@@ -112,47 +138,31 @@ export function TransactionFilters({ cards }: { cards: CardInfo[] }) {
       </div>
 
       {/* Date range */}
-      <div className="relative" style={{ width: "250px" }}>
-        <div
-          className="flex items-center gap-2 border bg-white px-4 py-3"
+      <div ref={dateRef} className="relative" style={{ width: "280px" }}>
+        <button
+          type="button"
+          onClick={() => setDateOpen(!dateOpen)}
+          className="flex w-full items-center gap-2 border bg-white px-4 py-3 text-left outline-none"
           style={{
             borderColor: "#C2C7CC",
             borderRadius: "8px",
+            fontFamily: "var(--font-dm-sans)",
+            fontSize: 14,
+            lineHeight: "20px",
+            fontWeight: 400,
+            color: dateFrom || dateTo ? "#1C1B1B" : "#72787C",
+            cursor: "pointer",
           }}
         >
-          <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
             <rect x="0.5" y="2.5" width="13" height="12" rx="2" stroke="#72787C" strokeWidth="1.2" />
             <line x1="0.5" y1="6.5" x2="13.5" y2="6.5" stroke="#72787C" strokeWidth="1.2" />
             <line x1="5" y1="10.5" x2="9" y2="10.5" stroke="#72787C" strokeWidth="1.2" strokeLinecap="round" />
           </svg>
-          <input
-            type="date"
-            value={dateFrom}
-            onChange={(e) => handleDateFromChange(e.target.value)}
-            className="w-full border-none bg-transparent p-0 text-base outline-none"
-            style={{
-              fontFamily: "var(--font-dm-sans)",
-              color: "#1C1B1B",
-              lineHeight: "25.6px",
-              fontWeight: 400,
-            }}
-          />
-          <span style={{ color: "#72787C" }}>–</span>
-          <input
-            type="date"
-            value={dateTo}
-            onChange={(e) => handleDateToChange(e.target.value)}
-            className="w-full border-none bg-transparent p-0 text-base outline-none"
-            style={{
-              fontFamily: "var(--font-dm-sans)",
-              color: "#1C1B1B",
-              lineHeight: "25.6px",
-              fontWeight: 400,
-            }}
-          />
-        </div>
+          <span className="truncate">{rangeText}</span>
+        </button>
         <span
-          className="absolute -top-2.5 left-3 px-1 text-[10px] uppercase"
+          className="absolute -top-2.5 left-3 z-10 px-1 text-[10px] uppercase"
           style={{
             fontFamily: "var(--font-dm-sans)",
             color: "#72787C",
@@ -164,6 +174,65 @@ export function TransactionFilters({ cards }: { cards: CardInfo[] }) {
         >
           DATE RANGE
         </span>
+        {dateOpen && (
+          <div
+            style={{
+              position: "absolute",
+              top: "100%",
+              left: 0,
+              right: 0,
+              zIndex: 50,
+              marginTop: 4,
+              backgroundColor: "#FFFFFF",
+              border: "1px solid #C2C7CC",
+              borderRadius: 8,
+              padding: 16,
+              display: "flex",
+              flexDirection: "column",
+              gap: 12,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+            }}
+          >
+            <div className="flex flex-col gap-1">
+              <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: 10, color: "#72787C", letterSpacing: "1px", textTransform: "uppercase" }}>
+                FROM
+              </span>
+              <input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => handleDateFromChange(e.target.value)}
+                className="w-full border px-3 py-2 outline-none"
+                style={{
+                  borderColor: "#C2C7CC",
+                  borderRadius: 6,
+                  fontFamily: "var(--font-dm-sans)",
+                  fontSize: 14,
+                  lineHeight: "20px",
+                  color: "#1C1B1B",
+                }}
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: 10, color: "#72787C", letterSpacing: "1px", textTransform: "uppercase" }}>
+                TO
+              </span>
+              <input
+                type="date"
+                value={dateTo}
+                onChange={(e) => handleDateToChange(e.target.value)}
+                className="w-full border px-3 py-2 outline-none"
+                style={{
+                  borderColor: "#C2C7CC",
+                  borderRadius: 6,
+                  fontFamily: "var(--font-dm-sans)",
+                  fontSize: 14,
+                  lineHeight: "20px",
+                  color: "#1C1B1B",
+                }}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Search */}
