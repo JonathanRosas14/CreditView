@@ -3,17 +3,22 @@
 import { PrismaCardRepository, PrismaTransactionRepository } from "@creditview/infra"
 import { verifySession } from "@/lib/dal"
 import { prisma } from "@creditview/database"
+import { checkRateLimit } from "@/lib/rate-limit"
 
 const cardRepo = new PrismaCardRepository()
 const txRepo = new PrismaTransactionRepository()
 
 export async function getCards() {
   const user = await verifySession()
+  const { limited } = await checkRateLimit(user.id, { maxRequests: 30, windowMs: 60_000 })
+  if (limited) throw new Error("Too many requests. Try again later.")
   return cardRepo.findByUserId(user.id)
 }
 
 export async function getCard(id: string) {
   const user = await verifySession()
+  const { limited } = await checkRateLimit(user.id, { maxRequests: 30, windowMs: 60_000 })
+  if (limited) return null
   const card = await cardRepo.findById(id)
   if (!card || card.userId !== user.id) return null
   return card
@@ -21,6 +26,8 @@ export async function getCard(id: string) {
 
 export async function getCardTransactions(cardId: string) {
   const user = await verifySession()
+  const { limited } = await checkRateLimit(user.id, { maxRequests: 30, windowMs: 60_000 })
+  if (limited) return []
   const card = await cardRepo.findById(cardId)
   if (!card || card.userId !== user.id) return []
   return txRepo.findByCardId(cardId)
@@ -31,6 +38,8 @@ export async function getRecentTransactions(limit: number, cardIds: string[]): P
 export async function getRecentTransactions(limit = 8, cardIds?: string[]): Promise<RecentTransaction[]> {
   if (!cardIds || cardIds.length === 0) {
     const user = await verifySession()
+    const { limited } = await checkRateLimit(user.id, { maxRequests: 30, windowMs: 60_000 })
+    if (limited) return []
     const cards = await cardRepo.findByUserId(user.id)
     cardIds = cards.map((c) => c.id)
   }
@@ -85,6 +94,9 @@ export async function getAllTransactions(
   filters?: { cardId?: string; dateFrom?: string; dateTo?: string; search?: string },
 ) {
   const user = await verifySession()
+  const { limited } = await checkRateLimit(user.id, { maxRequests: 30, windowMs: 60_000 })
+  if (limited) return { transactions: [], total: 0, page, pageSize, totalPages: 0 }
+
   const cards = await cardRepo.findByUserId(user.id)
   const cardIds = cards.map((c) => c.id)
   if (cardIds.length === 0) return { transactions: [], total: 0, page, pageSize, totalPages: 0 }

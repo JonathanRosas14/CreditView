@@ -2,6 +2,7 @@
 
 import { PrismaCardRepository, PrismaTransactionRepository } from "@creditview/infra"
 import { verifySession } from "@/lib/dal"
+import { checkRateLimit } from "@/lib/rate-limit"
 
 const cardRepo = new PrismaCardRepository()
 const txRepo = new PrismaTransactionRepository()
@@ -23,6 +24,9 @@ export type MonthlyStatement = {
 
 export async function getStatements(): Promise<MonthlyStatement[]> {
   const user = await verifySession()
+  const { limited } = await checkRateLimit(user.id, { maxRequests: 30, windowMs: 60_000 })
+  if (limited) return []
+
   const cards = await cardRepo.findByUserId(user.id)
 
   const statements: MonthlyStatement[] = []

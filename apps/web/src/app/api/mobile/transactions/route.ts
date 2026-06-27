@@ -3,6 +3,7 @@ import { PrismaCardRepository, PrismaTransactionRepository } from "@creditview/i
 import { Money, Transaction } from "@creditview/core"
 import { prisma } from "@creditview/database"
 import { verifyMobileToken, unauthorized } from "../lib/auth"
+import { checkRateLimit } from "@/lib/rate-limit"
 import { z } from "zod"
 
 const cardRepo = new PrismaCardRepository()
@@ -41,6 +42,10 @@ function clampPageSize(size: number): number {
 export async function GET(request: NextRequest) {
   try {
     const payload = await verifyMobileToken(request)
+    const { limited } = await checkRateLimit(`mobile:${payload.sub}`, { maxRequests: 30, windowMs: 60_000 })
+    if (limited) {
+      return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 })
+    }
     const cards = await cardRepo.findByUserId(payload.sub)
     const cardIds = cards.map((c) => c.id)
     if (cardIds.length === 0) {
@@ -105,6 +110,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const payload = await verifyMobileToken(request)
+    const { limited } = await checkRateLimit(`mobile:${payload.sub}`, { maxRequests: 10, windowMs: 60_000 })
+    if (limited) {
+      return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 })
+    }
     const body = await request.json()
     const parsed = createSchema.safeParse(body)
     if (!parsed.success) {

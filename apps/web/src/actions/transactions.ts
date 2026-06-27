@@ -7,6 +7,7 @@ import { logAuditEvent } from "@/lib/audit"
 import { revalidatePath } from "next/cache"
 import { prisma } from "@creditview/database"
 import { createTransactionSchema } from "@/lib/validation"
+import { checkRateLimit } from "@/lib/rate-limit"
 
 const cardRepo = new PrismaCardRepository()
 const txRepo = new PrismaTransactionRepository()
@@ -16,18 +17,20 @@ export async function createTransactionAction(
   formData: FormData,
 ) {
   const user = await verifySession()
+  const { limited } = await checkRateLimit(user.id, { maxRequests: 10, windowMs: 60_000 })
+  if (limited) return { success: false, error: "Too many requests. Try again later.", warning: null }
 
   const parsed = createTransactionSchema.safeParse(Object.fromEntries(formData))
   if (!parsed.success) {
-    return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" }
+    return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input", warning: null }
   }
 
   const { cardId, type, amount, description, date: dateStr, installments, budgetId } = parsed.data
 
   try {
     const cardRecord = await cardRepo.findById(cardId)
-    if (!cardRecord) return { success: false, error: "Card not found" }
-    if (cardRecord.userId !== user.id) return { success: false, error: "Card not found" }
+    if (!cardRecord) return { success: false, error: "Card not found", warning: null }
+    if (cardRecord.userId !== user.id) return { success: false, error: "Card not found", warning: null }
 
     const tx = Transaction.create({
       cardId,

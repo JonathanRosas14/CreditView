@@ -3,6 +3,7 @@
 import { prisma } from "@creditview/database"
 import { verifySession } from "@/lib/dal"
 import { revalidatePath } from "next/cache"
+import { checkRateLimit } from "@/lib/rate-limit"
 
 function getNextDate(dayOfMonth: number): { date: Date; label: string } {
   const today = new Date()
@@ -73,6 +74,8 @@ export async function generateAlerts({
 
 export async function getAlerts() {
   const user = await verifySession()
+  const { limited } = await checkRateLimit(user.id, { maxRequests: 30, windowMs: 60_000 })
+  if (limited) throw new Error("Too many requests. Try again later.")
 
   const cards = await prisma.card.findMany({
     where: { userId: user.id, isActive: true },
@@ -99,6 +102,8 @@ export async function getAlerts() {
 
 export async function getUnreadAlertCount() {
   const user = await verifySession()
+  const { limited } = await checkRateLimit(user.id, { maxRequests: 30, windowMs: 60_000 })
+  if (limited) throw new Error("Too many requests. Try again later.")
 
   const count = await prisma.alert.count({
     where: { userId: user.id, isRead: false },
@@ -109,6 +114,8 @@ export async function getUnreadAlertCount() {
 
 export async function markAlertAsRead(id: string) {
   const user = await verifySession()
+  const { limited } = await checkRateLimit(user.id, { maxRequests: 30, windowMs: 60_000 })
+  if (limited) return
 
   const alert = await prisma.alert.findUnique({ where: { id } })
   if (!alert || alert.userId !== user.id) return
@@ -123,6 +130,8 @@ export async function markAlertAsRead(id: string) {
 
 export async function markAllAlertsAsRead() {
   const user = await verifySession()
+  const { limited } = await checkRateLimit(user.id, { maxRequests: 10, windowMs: 60_000 })
+  if (limited) return
 
   await prisma.alert.updateMany({
     where: { userId: user.id, isRead: false },

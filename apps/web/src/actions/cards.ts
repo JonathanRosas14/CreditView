@@ -6,6 +6,7 @@ import { verifySession } from "@/lib/dal"
 import { logAuditEvent } from "@/lib/audit"
 import { revalidatePath } from "next/cache"
 import { createCardSchema, updateCardSchema } from "@/lib/validation"
+import { checkRateLimit } from "@/lib/rate-limit"
 
 const cardRepo = new PrismaCardRepository()
 const txRepo = new PrismaTransactionRepository()
@@ -13,6 +14,8 @@ const cardService = new CardService(cardRepo, txRepo)
 
 export async function createCardAction(_prevState: unknown, formData: FormData) {
   const user = await verifySession()
+  const { limited } = await checkRateLimit(user.id, { maxRequests: 10, windowMs: 60_000 })
+  if (limited) return { success: false, error: "Too many requests. Try again later." }
 
   const parsed = createCardSchema.safeParse(Object.fromEntries(formData))
   if (!parsed.success) {
@@ -50,6 +53,8 @@ export async function createCardAction(_prevState: unknown, formData: FormData) 
 
 export async function updateCardAction(cardId: string, _prevState: unknown, formData: FormData) {
   const user = await verifySession()
+  const { limited } = await checkRateLimit(user.id, { maxRequests: 10, windowMs: 60_000 })
+  if (limited) return { success: false, error: "Too many requests. Try again later." }
 
   const parsed = updateCardSchema.safeParse(Object.fromEntries(formData))
   if (!parsed.success) {
@@ -86,6 +91,8 @@ export async function updateCardAction(cardId: string, _prevState: unknown, form
 
 export async function deleteCardAction(id: string) {
   const user = await verifySession()
+  const { limited } = await checkRateLimit(user.id, { maxRequests: 10, windowMs: 60_000 })
+  if (limited) throw new Error("Too many requests. Try again later.")
 
   const card = await cardRepo.findById(id)
   if (!card) throw new Error("Card not found")

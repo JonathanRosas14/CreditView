@@ -1,29 +1,17 @@
 "use server"
 
-import { headers } from "next/headers"
 import { prisma } from "@creditview/database"
 import { forgotPasswordSchema, resetPasswordSchema } from "@/lib/validation"
 import { logAuditEvent } from "@/lib/audit"
 import bcrypt from "bcryptjs"
-import { randomUUID } from "node:crypto"
-import { checkRateLimit } from "@/lib/rate-limit"
+import { randomUUID, createHash } from "node:crypto"
+import { getActionIp, checkRateLimit } from "@/lib/rate-limit"
 
 type PasswordState = {
   success: boolean
   error: string | null
   message: string | null
   resetLink: string | null
-}
-
-async function getActionIp(): Promise<string> {
-  try {
-    const h = await headers()
-    const forwarded = h.get("x-forwarded-for")
-    if (forwarded) return forwarded.split(",")[0].trim()
-    return h.get("x-real-ip") ?? "127.0.0.1"
-  } catch {
-    return "127.0.0.1"
-  }
 }
 
 export async function forgotPasswordAction(
@@ -49,10 +37,11 @@ export async function forgotPasswordAction(
   }
 
   const token = randomUUID() + randomUUID()
+  const tokenHash = createHash("sha256").update(token).digest("hex")
   const expiresAt = new Date(Date.now() + 60 * 60 * 1000)
 
   await prisma.resetToken.deleteMany({ where: { userId: user.id, usedAt: null } })
-  await prisma.resetToken.create({ data: { userId: user.id, token, expiresAt } })
+  await prisma.resetToken.create({ data: { userId: user.id, token: tokenHash, expiresAt } })
 
   await logAuditEvent({
     userId: user.id,
@@ -85,8 +74,9 @@ export async function resetPasswordAction(
   }
 
   const { token, password } = parsed.data
+  const tokenHash = createHash("sha256").update(token).digest("hex")
 
-  const resetToken = await prisma.resetToken.findUnique({ where: { token } })
+  const resetToken = await prisma.resetToken.findUnique({ where: { token: tokenHash } })
   if (!resetToken) {
     return { success: false, error: "Invalid or expired reset token", message: null, resetLink: null }
   }

@@ -4,6 +4,8 @@ import { prisma } from "@creditview/database"
 import { verifySession } from "@/lib/dal"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { logAuditEvent } from "@/lib/audit"
+import { checkRateLimit } from "@/lib/rate-limit"
 
 const createBudgetSchema = z.object({
   cardId: z.string().optional(),
@@ -27,6 +29,8 @@ export type BudgetWithCard = {
 
 export async function getBudgets(): Promise<BudgetWithCard[]> {
   const user = await verifySession()
+  const { limited } = await checkRateLimit(user.id, { maxRequests: 30, windowMs: 60_000 })
+  if (limited) throw new Error("Too many requests. Try again later.")
 
   const budgets = await prisma.budget.findMany({
     where: { userId: user.id },
@@ -52,6 +56,8 @@ export async function createBudgetAction(
   formData: FormData,
 ) {
   const user = await verifySession()
+  const { limited } = await checkRateLimit(user.id, { maxRequests: 10, windowMs: 60_000 })
+  if (limited) return { success: false, error: "Too many requests. Try again later." }
 
   const parsed = createBudgetSchema.safeParse(Object.fromEntries(formData))
   if (!parsed.success) {
@@ -61,7 +67,7 @@ export async function createBudgetAction(
   const { cardId, category, amount, period, startDate } = parsed.data
 
   try {
-    await prisma.budget.create({
+    const budget = await prisma.budget.create({
       data: {
         userId: user.id,
         cardId: cardId || null,
@@ -73,6 +79,14 @@ export async function createBudgetAction(
       },
     })
 
+    await logAuditEvent({
+      userId: user.id,
+      entity: "Budget",
+      entityId: budget.id,
+      action: "CREATE",
+      newValue: { category, amount, period, cardId: cardId || null },
+    })
+
     revalidatePath("/budgets")
     return { success: true, error: null }
   } catch (e) {
@@ -82,9 +96,19 @@ export async function createBudgetAction(
 
 export async function deleteBudgetAction(id: string) {
   const user = await verifySession()
+  const { limited } = await checkRateLimit(user.id, { maxRequests: 10, windowMs: 60_000 })
+  if (limited) throw new Error("Too many requests. Try again later.")
 
   const budget = await prisma.budget.findUnique({ where: { id } })
   if (!budget || budget.userId !== user.id) throw new Error("Not found")
+
+  await logAuditEvent({
+    userId: user.id,
+    entity: "Budget",
+    entityId: id,
+    action: "DELETE",
+    oldValue: { category: budget.category, amount: Number(budget.amount), period: budget.period },
+  })
 
   await prisma.budget.delete({ where: { id } })
   revalidatePath("/budgets")

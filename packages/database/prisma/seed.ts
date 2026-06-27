@@ -234,7 +234,7 @@ async function main() {
   }
 
   console.log(`Seeded ${currencies.length} currencies`)
-  console.log(`Seeded user: ${user.email} / password123`)
+  console.log(`Seeded user: ${user.email}`)
   console.log(`Seeded 3 cards with ${await prisma.transaction.count()} transactions`)
   console.log(`Seeded ${allBudgets.length} budgets`)
 }

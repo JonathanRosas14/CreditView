@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@creditview/database"
 import { verifyMobileToken, unauthorized } from "../lib/auth"
+import { checkRateLimit } from "@/lib/rate-limit"
 import { z } from "zod"
 
 const createSchema = z.object({
@@ -14,6 +15,10 @@ const createSchema = z.object({
 export async function GET(request: Request) {
   try {
     const payload = await verifyMobileToken(request)
+    const { limited } = await checkRateLimit(`mobile:${payload.sub}`, { maxRequests: 30, windowMs: 60_000 })
+    if (limited) {
+      return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 })
+    }
     const budgets = await prisma.budget.findMany({
       where: { userId: payload.sub },
       include: { card: { select: { id: true, name: true } } },
@@ -42,6 +47,10 @@ export async function GET(request: Request) {
 export async function POST(request: NextRequest) {
   try {
     const payload = await verifyMobileToken(request)
+    const { limited } = await checkRateLimit(`mobile:${payload.sub}`, { maxRequests: 10, windowMs: 60_000 })
+    if (limited) {
+      return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 })
+    }
     const body = await request.json()
     const parsed = createSchema.safeParse(body)
     if (!parsed.success) {

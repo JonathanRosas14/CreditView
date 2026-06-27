@@ -3,11 +3,14 @@
 import { prisma } from "@creditview/database"
 import { verifySession } from "@/lib/dal"
 import { z } from "zod"
+import { checkRateLimit } from "@/lib/rate-limit"
 
 const cardIdSchema = z.string().optional()
 
 export async function exportTransactionsCSV(cardId?: string): Promise<string> {
   const user = await verifySession()
+  const { limited } = await checkRateLimit(user.id, { maxRequests: 10, windowMs: 60_000 })
+  if (limited) throw new Error("Too many requests. Try again later.")
 
   const parsed = cardIdSchema.safeParse(cardId)
   const validCardId = parsed.success ? parsed.data : undefined

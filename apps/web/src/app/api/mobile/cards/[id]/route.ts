@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { PrismaCardRepository, PrismaTransactionRepository } from "@creditview/infra"
 import { CardService, Money } from "@creditview/core"
 import { verifyMobileToken, unauthorized } from "../../lib/auth"
+import { checkRateLimit } from "@/lib/rate-limit"
 import { z } from "zod"
 
 const cardRepo = new PrismaCardRepository()
@@ -27,6 +28,10 @@ async function getOwnedCard(cardId: string, userId: string) {
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const payload = await verifyMobileToken(request)
+    const { limited } = await checkRateLimit(`mobile:${payload.sub}`, { maxRequests: 30, windowMs: 60_000 })
+    if (limited) {
+      return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 })
+    }
     const { id } = await params
     const card = await getOwnedCard(id, payload.sub)
     if (!card) return NextResponse.json({ error: "Not found" }, { status: 404 })
@@ -68,6 +73,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const payload = await verifyMobileToken(request)
+    const { limited } = await checkRateLimit(`mobile:${payload.sub}`, { maxRequests: 10, windowMs: 60_000 })
+    if (limited) {
+      return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 })
+    }
     const { id } = await params
     const card = await getOwnedCard(id, payload.sub)
     if (!card) return NextResponse.json({ error: "Not found" }, { status: 404 })
@@ -100,6 +109,10 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const payload = await verifyMobileToken(request)
+    const { limited } = await checkRateLimit(`mobile:${payload.sub}`, { maxRequests: 10, windowMs: 60_000 })
+    if (limited) {
+      return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 })
+    }
     const { id } = await params
     const card = await getOwnedCard(id, payload.sub)
     if (!card) return NextResponse.json({ error: "Not found" }, { status: 404 })

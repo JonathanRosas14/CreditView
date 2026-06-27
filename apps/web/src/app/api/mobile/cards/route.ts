@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { PrismaCardRepository, PrismaTransactionRepository } from "@creditview/infra"
 import { CardService, Money } from "@creditview/core"
 import { verifyMobileToken, unauthorized } from "../lib/auth"
+import { checkRateLimit } from "@/lib/rate-limit"
 import { z } from "zod"
 
 const cardRepo = new PrismaCardRepository()
@@ -21,6 +22,10 @@ const createSchema = z.object({
 export async function GET(request: Request) {
   try {
     const payload = await verifyMobileToken(request)
+    const { limited } = await checkRateLimit(`mobile:${payload.sub}`, { maxRequests: 30, windowMs: 60_000 })
+    if (limited) {
+      return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 })
+    }
     const cards = await cardRepo.findByUserId(payload.sub)
     const result = cards.map((c) => ({
       id: c.id,
@@ -47,6 +52,10 @@ export async function GET(request: Request) {
 export async function POST(request: NextRequest) {
   try {
     const payload = await verifyMobileToken(request)
+    const { limited } = await checkRateLimit(`mobile:${payload.sub}`, { maxRequests: 10, windowMs: 60_000 })
+    if (limited) {
+      return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 })
+    }
     const body = await request.json()
     const parsed = createSchema.safeParse(body)
     if (!parsed.success) {

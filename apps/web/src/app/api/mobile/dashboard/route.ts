@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { PrismaCardRepository, PrismaTransactionRepository } from "@creditview/infra"
 import { prisma } from "@creditview/database"
 import { verifyMobileToken, unauthorized } from "../lib/auth"
+import { checkRateLimit } from "@/lib/rate-limit"
 
 const cardRepo = new PrismaCardRepository()
 const txRepo = new PrismaTransactionRepository()
@@ -23,6 +24,10 @@ function deriveCategory(description: string): string {
 export async function GET(request: Request) {
   try {
     const payload = await verifyMobileToken(request)
+    const { limited } = await checkRateLimit(`mobile:${payload.sub}`, { maxRequests: 30, windowMs: 60_000 })
+    if (limited) {
+      return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 })
+    }
     const cards = await cardRepo.findByUserId(payload.sub)
     const cardIds = cards.map((c) => c.id)
 
