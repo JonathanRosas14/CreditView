@@ -8,6 +8,10 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
+    "mobile": "pnpm --filter mobile start",
+    "mobile:android": "pnpm --filter mobile android",
+    "mobile:ios": "pnpm --filter mobile ios",
+    "mobile:web": "pnpm --filter mobile web",
     "format": "prettier --write \"**/*.{ts,tsx,json}\"",
     "db:migrate": "pnpm --filter @creditview/database exec prisma migrate dev",
     "db:studio": "pnpm --filter @creditview/database exec prisma studio"

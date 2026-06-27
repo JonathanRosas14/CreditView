@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "CreditView",
+    "slug": "creditview",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "creditview",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.creditview"
+    },
+    "android": {
+      "package": "app.creditview",
+      "adaptiveIcon": {
+        "backgroundColor": "#FCF9F8",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ]
+  }
+}

@@ -1,10 +1,12 @@
 "use server"
 
+import { headers } from "next/headers"
 import { prisma } from "@creditview/database"
 import { forgotPasswordSchema, resetPasswordSchema } from "@/lib/validation"
 import { logAuditEvent } from "@/lib/audit"
 import bcrypt from "bcryptjs"
 import { randomUUID } from "node:crypto"
+import { checkRateLimit } from "@/lib/rate-limit"
 
 type PasswordState = {
   success: boolean
@@ -13,10 +15,23 @@ type PasswordState = {
   resetLink: string | null
 }
 
+async function getActionIp(): Promise<string> {
+  const h = await headers()
+  const forwarded = h.get("x-forwarded-for")
+  if (forwarded) return forwarded.split(",")[0].trim()
+  return h.get("x-real-ip") ?? "127.0.0.1"
+}
+
 export async function forgotPasswordAction(
   _prevState: PasswordState | null,
   formData: FormData,
 ): Promise<PasswordState> {
+  const ip = await getActionIp()
+  const { limited } = await checkRateLimit(ip, { maxRequests: 3, windowMs: 60_000 })
+  if (limited) {
+    return { success: false, error: "Too many requests. Try again later.", message: null, resetLink: null }
+  }
+
   const parsed = forgotPasswordSchema.safeParse(Object.fromEntries(formData))
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input", message: null, resetLink: null }
@@ -54,6 +69,12 @@ export async function resetPasswordAction(
   _prevState: PasswordState | null,
   formData: FormData,
 ): Promise<PasswordState> {
+  const ip = await getActionIp()
+  const { limited } = await checkRateLimit(ip, { maxRequests: 5, windowMs: 60_000 })
+  if (limited) {
+    return { success: false, error: "Too many requests. Try again later.", message: null, resetLink: null }
+  }
+
   const parsed = resetPasswordSchema.safeParse(Object.fromEntries(formData))
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input", message: null, resetLink: null }

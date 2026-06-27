@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@theme {
+  --color-navy: #002434;
+  --color-cream: #FCF9F8;
+  --color-secondary: #72787C;
+  --color-border: #C2C7CC;
+}
