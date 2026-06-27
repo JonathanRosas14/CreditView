@@ -25,6 +25,10 @@ export async function checkRateLimit(
   return { limited: false, remaining: config.maxRequests - entry.count }
 }
 
+export function resetRateLimit(): void {
+  ipMap.clear()
+}
+
 export function getClientIp(request: Request): string {
   const forwarded = request.headers.get("x-forwarded-for")
   if (forwarded) return forwarded.split(",")[0].trim()

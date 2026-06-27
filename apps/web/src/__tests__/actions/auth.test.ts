@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest"
 import { loginAction, registerAction } from "../../actions/auth"
 import { signIn } from "../../lib/auth"
 import { prisma } from "@creditview/database"
+import { resetRateLimit } from "../../lib/rate-limit"
 
 vi.mock("@/lib/dal", () => ({ verifySession: vi.fn().mockResolvedValue({ id: "user-1", email: "test@test.com", name: "Test" }) }))
 vi.mock("@/lib/auth", () => ({ signIn: vi.fn(), signOut: vi.fn() }))
@@ -20,6 +21,7 @@ vi.mock("next/navigation", () => ({ redirect: vi.fn() }))
 
 describe("loginAction", () => {
   beforeEach(() => {
+    resetRateLimit()
     vi.clearAllMocks()
   })
 
@@ -46,6 +48,7 @@ describe("loginAction", () => {
 
 describe("registerAction", () => {
   beforeEach(() => {
+    resetRateLimit()
     vi.clearAllMocks()
   })
 
