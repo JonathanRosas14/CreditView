@@ -26,7 +26,7 @@ describe("loginAction", () => {
   it("returns error for invalid email", async () => {
     const formData = new FormData()
     formData.set("email", "not-email")
-    formData.set("password", "123456")
+    formData.set("password", "12345678")
 
     const result = await loginAction({ success: false, error: "" }, formData)
     expect(result.success).toBe(false)
@@ -36,7 +36,7 @@ describe("loginAction", () => {
   it("returns error for short password", async () => {
     const formData = new FormData()
     formData.set("email", "test@test.com")
-    formData.set("password", "12345")
+    formData.set("password", "1234567")
 
     const result = await loginAction({ success: false, error: "" }, formData)
     expect(result.success).toBe(false)
@@ -53,8 +53,8 @@ describe("registerAction", () => {
     const formData = new FormData()
     formData.set("name", "John")
     formData.set("email", "john@test.com")
-    formData.set("password", "123456")
-    formData.set("confirmPassword", "654321")
+    formData.set("password", "12345678")
+    formData.set("confirmPassword", "87654321")
 
     const result = await registerAction({ success: false, error: "" }, formData)
     expect(result.success).toBe(false)
@@ -74,8 +74,8 @@ describe("registerAction", () => {
     const formData = new FormData()
     formData.set("name", "John")
     formData.set("email", "john@test.com")
-    formData.set("password", "123456")
-    formData.set("confirmPassword", "123456")
+    formData.set("password", "12345678")
+    formData.set("confirmPassword", "12345678")
 
     const result = await registerAction({ success: false, error: "" }, formData)
     expect(result.success).toBe(false)
@@ -97,8 +97,8 @@ describe("registerAction", () => {
     const formData = new FormData()
     formData.set("name", "John")
     formData.set("email", "john@test.com")
-    formData.set("password", "123456")
-    formData.set("confirmPassword", "123456")
+    formData.set("password", "12345678")
+    formData.set("confirmPassword", "12345678")
 
     await registerAction({ success: false, error: "" }, formData)
     expect(prisma.user.create).toHaveBeenCalled()

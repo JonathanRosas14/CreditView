@@ -8,17 +8,17 @@ import {
 
 describe("loginSchema", () => {
   it("accepts valid input", () => {
-    const result = loginSchema.safeParse({ email: "test@test.com", password: "123456" })
+    const result = loginSchema.safeParse({ email: "test@test.com", password: "12345678" })
     expect(result.success).toBe(true)
   })
 
   it("rejects invalid email", () => {
-    const result = loginSchema.safeParse({ email: "not-an-email", password: "123456" })
+    const result = loginSchema.safeParse({ email: "not-an-email", password: "12345678" })
     expect(result.success).toBe(false)
   })
 
   it("rejects short password", () => {
-    const result = loginSchema.safeParse({ email: "test@test.com", password: "12345" })
+    const result = loginSchema.safeParse({ email: "test@test.com", password: "1234567" })
     expect(result.success).toBe(false)
   })
 })
@@ -28,8 +28,8 @@ describe("registerSchema", () => {
     const result = registerSchema.safeParse({
       name: "John",
       email: "john@test.com",
-      password: "123456",
-      confirmPassword: "123456",
+      password: "12345678",
+      confirmPassword: "12345678",
     })
     expect(result.success).toBe(true)
   })
@@ -38,8 +38,8 @@ describe("registerSchema", () => {
     const result = registerSchema.safeParse({
       name: "John",
       email: "john@test.com",
-      password: "123456",
-      confirmPassword: "654321",
+      password: "12345678",
+      confirmPassword: "87654321",
     })
     expect(result.success).toBe(false)
     if (!result.success) {
@@ -51,8 +51,8 @@ describe("registerSchema", () => {
     const result = registerSchema.safeParse({
       name: "",
       email: "john@test.com",
-      password: "123456",
-      confirmPassword: "123456",
+      password: "12345678",
+      confirmPassword: "12345678",
     })
     expect(result.success).toBe(false)
   })

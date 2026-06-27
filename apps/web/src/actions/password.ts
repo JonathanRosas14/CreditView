@@ -16,10 +16,14 @@ type PasswordState = {
 }
 
 async function getActionIp(): Promise<string> {
-  const h = await headers()
-  const forwarded = h.get("x-forwarded-for")
-  if (forwarded) return forwarded.split(",")[0].trim()
-  return h.get("x-real-ip") ?? "127.0.0.1"
+  try {
+    const h = await headers()
+    const forwarded = h.get("x-forwarded-for")
+    if (forwarded) return forwarded.split(",")[0].trim()
+    return h.get("x-real-ip") ?? "127.0.0.1"
+  } catch {
+    return "127.0.0.1"
+  }
 }
 
 export async function forgotPasswordAction(
